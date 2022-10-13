@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
     public Slider strengthSlider;
     private GameObject sliderFill;
     private GameObject damageText;
-    private bool bIsPlaying = true;
+    private bool bIsPlaying = false;
     [SerializeField] private GameObject laser;
 
     private GameManager gameHQ;
@@ -55,30 +55,25 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
+        //I have made the centre point the centre of the screen so this is a little redundant
+        SetupTargetVector();
+    }
+
+    //Use Awake to get all your references to avoid the dreaded NullReferenceExeption
+    void Awake(){
         //use transform.Find for children game objects
         powerIndicator = transform.Find("Power Level").gameObject;
+        gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
+        sliderFill = strengthSlider.fillRect.gameObject;
+        sliderFill.SetActive(true);
+        strengthSlider.gameObject.SetActive(false);
         //the float is the distance to move the power cylinder forwards to create the nice effect
         indicatorMoveStep = -0.5f / maxPower;
         //set the divisor for lasers so on max power it has a value of 2
         laserPowerDivisor = maxPower/2f;
-        //set up the power level indicator by calling with a zero argument
-        //AddPowerLevel(0);
-        //I have made the centre point the centre of the screen so this is a little redundant
-        SetupTargetVector();
         //Get the rigidbody so we can add our forces for a more natural game experience
         playerRB = GetComponent<Rigidbody>();
-        gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
-        //power = gameHQ.playerPower;
-        //strength = gameHQ.playerStrength;
-        // strengthSlider.maxValue = strength;
-        // strengthSlider.value = strength;
-
-        sliderFill = strengthSlider.fillRect.gameObject;
-        //sliderFill.SetActive(true);
-        strengthSlider.gameObject.SetActive(false);
-    //Why does this stop lasers from working??? Because in change power accessed laser variable (bad)
-        EnablePlayer(gameHQ.playerStrength,gameHQ.playerPower);
-        //DisablePlayer();
     }
 
     // Update is called once per frame
@@ -114,6 +109,7 @@ public class PlayerController : MonoBehaviour
     }
 
     void FixedUpdate(){
+        if(!bIsPlaying) return; 
         MoveMe(targetVector);
         //this comes second as it does bounds checking which uses MoveMe() as well
         UpdateTargetVector();
@@ -173,7 +169,7 @@ public class PlayerController : MonoBehaviour
             //add a bit of strength
             //AddStrengthLevel(5f);
         }
-        else{bIsFiring = false;
+        else{//bIsFiring = false;
             
         }
         UpdatePowerIndicator();

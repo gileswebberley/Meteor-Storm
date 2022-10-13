@@ -30,22 +30,20 @@ public class SpawnManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
+
+        //RestartSpawn();
+    }
+
+    void Awake(){
         //reference to player
         player = GameObject.Find("Player").GetComponent<PlayerController>();
+        maxSpawnY = player.GetBounds().y;
+        //Debug.Log("maxSpawnY: "+maxSpawnY);
+        maxSpawnX = player.GetBounds().x;
+        //Debug.Log("maxSpawnX: "+maxSpawnX);
         //reference to game manager
         gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
-        //maxSpawnTime = player.GetMaxSpeed();
-        //spawnTime = maxSpawnTime/player.GetSpeed();
-        maxSpawnY = player.GetBounds().y;
-        //maxSpawnY *= 2;
-        Debug.Log("maxSpawnY: "+maxSpawnY);
-        maxSpawnX = player.GetBounds().x;
-        //maxSpawnX *= 2;
-        Debug.Log("maxSpawnX: "+maxSpawnX);
-
-        RestartSpawn();
-        //spawning no longer based on time
-        //InvokeRepeating("SpawnAll",spawnTime,spawnTime);
     }
 
     // Update is called once per frame

@@ -32,6 +32,9 @@ public class GameManager : MonoBehaviour {
     void Awake(){
         spawn = GameObject.Find("Spawn Manager").GetComponent<SpawnManager>();
         player = GameObject.Find("Player").GetComponent<PlayerController>();
+        if(spawn == null || player == null){
+            Debug.LogError("PLAYER OR SPAWN IS NULL TO GAME MANAGER");
+        }
         //StartGame();
     }
 
@@ -80,8 +83,8 @@ public class GameManager : MonoBehaviour {
         //I don't know why this makes everything stop working, 
         //only change is calling from here rather than from the 
         //Start() in each of the class definitions
-        //player.EnablePlayer(playerStrength,playerPower);
-        //spawn.RestartSpawn();
+        player.EnablePlayer(playerStrength,playerPower);
+        spawn.RestartSpawn();
     }
 
     public void RestartGame(){
