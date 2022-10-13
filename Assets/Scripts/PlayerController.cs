@@ -51,26 +51,30 @@ public class PlayerController : MonoBehaviour
     private float roundsPerSecond = 10f;
     //Implement damage
     private float strength = 0;
+    private float maxStrength;
 
     // Start is called before the first frame update
     void Start()
-    {
-        
+    {        
         //I have made the centre point the centre of the screen so this is a little redundant
         SetupTargetVector();
     }
 
-    //Use Awake to get all your references to avoid the dreaded NullReferenceExeption
+    //Use Awake to get all your references (instantiate objects) to avoid the dreaded NullReferenceExeption
     void Awake(){
         //use transform.Find for children game objects
         powerIndicator = transform.Find("Power Level").gameObject;
-        gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
-        sliderFill = strengthSlider.fillRect.gameObject;
-        sliderFill.SetActive(true);
-        strengthSlider.gameObject.SetActive(false);
         //the float is the distance to move the power cylinder forwards to create the nice effect
         indicatorMoveStep = -0.5f / maxPower;
-        //set the divisor for lasers so on max power it has a value of 2
+        //connect with game manager
+        gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
+        damageText = transform.Find("Strength").gameObject;
+        damageText.SetActive(false);
+        //get the fill of the strength slider so it can be updated
+        sliderFill = strengthSlider.fillRect.gameObject;
+        //then hide the fill's parent to be shown when in "play" state
+        //strengthSlider.gameObject.SetActive(false);
+        //set the divisor for lasers so on max power it has a value of 2 - deprecated for now (playability)
         laserPowerDivisor = maxPower/2f;
         //Get the rigidbody so we can add our forces for a more natural game experience
         playerRB = GetComponent<Rigidbody>();
@@ -121,19 +125,25 @@ public class PlayerController : MonoBehaviour
 
     public void DisablePlayer(){
         bIsPlaying = false;
-        strengthSlider.gameObject.SetActive(false);
+        //a test whether I've grabbed the correct game object
+        //yep, so it can hide the text and the indicator
+        damageText.SetActive(false);
+        //strengthSlider.gameObject.SetActive(false);
     }
 
     public void EnablePlayer(float aStrength, float aPower){
         bIsPlaying = true;
+        //reset strength to zero
         strength = 0;
-        strengthSlider.maxValue = aStrength;
-        strengthSlider.value = aStrength;
-        sliderFill.SetActive(true);
+        //set the slider parameters to match the strength
+        maxStrength = aStrength;
+        strengthSlider.maxValue = maxStrength;
         strengthSlider.gameObject.SetActive(true);
         AddStrengthLevel(aStrength);
+        //a test whether I've grabbed the correct game object
+        //yep, so it can hide the text and the indicator
+        damageText.SetActive(true);
         speed = minSpeed;
-
         AddPowerLevel(-power);
         AddPowerLevel(aPower);
     }
@@ -149,12 +159,9 @@ public class PlayerController : MonoBehaviour
             //add a bit of strenth
             AddStrengthLevel(gameHQ.playerStrength/10f);
             Destroy(other.gameObject);
-        }
-        else if(other.CompareTag("Star")){
-            //++ charge up code to go in here
-            //AddPowerLevel(-1);
+        }else if(other.CompareTag("Star")){
+            //death by a star, damage is based on mass in rigidbody
             AddDamageLevel(other.gameObject);
-            //Destroy(other.gameObject);
         }
     }
 
@@ -166,10 +173,9 @@ public class PlayerController : MonoBehaviour
         }
         else if(power > maxPower){
             power = maxPower;
-            //add a bit of strength
-            //AddStrengthLevel(5f);
         }
-        else{//bIsFiring = false;
+        else{
+            //bIsFiring = false;//why is this here??
             
         }
         UpdatePowerIndicator();
@@ -229,6 +235,7 @@ public class PlayerController : MonoBehaviour
         //If we are completely damaged it's game over
         if(strength <= 0){
             gameHQ.GameOver();
+            strength = 0;
         }
         sliderFill.SetActive(true);
         strengthSlider.value = strength;
@@ -240,8 +247,8 @@ public class PlayerController : MonoBehaviour
         }else{
             strength += toAdd;
             //maxes out at it's start value
-            if(strength >= gameHQ.playerStrength){
-                strength = gameHQ.playerStrength;
+            if(strength >= maxStrength){
+                strength = maxStrength;
             }            
             sliderFill.SetActive(true);
             strengthSlider.value = strength;
