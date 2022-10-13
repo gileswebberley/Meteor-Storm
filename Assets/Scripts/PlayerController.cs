@@ -1,0 +1,340 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class PlayerController : MonoBehaviour
+{
+    public Slider strengthSlider;
+    private GameObject sliderFill;
+    private GameObject damageText;
+    private bool bIsPlaying = true;
+    [SerializeField] private GameObject laser;
+
+    private GameManager gameHQ;
+    private Rigidbody playerRB;
+    //takes into account where the mouse is when game starts, might be better to just have around the centre
+    private Vector3 originalMousePosition;
+    //was used in kinematic first attempt
+    private Vector3 targetPosition;
+    //this is essentially THE vector to use with AddForce()
+    private Vector3 targetVector;
+    //is the targetVector set up and ready to be used via UpdateTargetVector()
+    private bool bTargetV = false;
+    //to convert the mouse position into an "identity matrix"? (is that where the value is between -1.0 and 1.0?) store the screen width and height
+    private Vector3 screenModifier;
+    //maximum devation across
+    private float xBounds = 50f;
+    //maximum deviation up and down
+    private float yBounds = 50f;
+    //all the speed based properties -------
+    //affects control twitchyness, other objects use it to make it feel like speed has changed
+    private float speed = 10f;
+    private float minSpeed = 5f;
+    private float maxSpeed = 20f;
+    //the amount of torque added by imaginary booster rockets (help get control back when spinning)using System.Collections;
+    private float rotationalBoosters = 0.5f;
+    //The number by which targetVector.x is divided within AddTorque()
+    private float rotationalDamper = 30f;
+
+    private float power = 0f;
+    private float maxPower = 20f;
+    private float indicatorMoveStep;
+    private GameObject powerIndicator;
+    //how much power so the victims can check how much to remove from themselves
+    private float laserPower = 1f;
+    //to use up power when firing rather than limit the firing, a divisor of maxPower
+    private float laserPowerUsageDivisor = 100f;//so number of shots with max power
+    //originally had this as maxPower so it would be 1 when on full power
+    private float laserPowerDivisor;
+    private bool bIsFiring = false;
+    private float roundsPerSecond = 10f;
+    //Implement damage
+    private float strength = 0;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        //use transform.Find for children game objects
+        powerIndicator = transform.Find("Power Level").gameObject;
+        //the float is the distance to move the power cylinder forwards to create the nice effect
+        indicatorMoveStep = -0.5f / maxPower;
+        //set the divisor for lasers so on max power it has a value of 2
+        laserPowerDivisor = maxPower/2f;
+        //set up the power level indicator by calling with a zero argument
+        //AddPowerLevel(0);
+        //I have made the centre point the centre of the screen so this is a little redundant
+        SetupTargetVector();
+        //Get the rigidbody so we can add our forces for a more natural game experience
+        playerRB = GetComponent<Rigidbody>();
+        gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
+        //power = gameHQ.playerPower;
+        //strength = gameHQ.playerStrength;
+        // strengthSlider.maxValue = strength;
+        // strengthSlider.value = strength;
+
+        sliderFill = strengthSlider.fillRect.gameObject;
+        //sliderFill.SetActive(true);
+        strengthSlider.gameObject.SetActive(false);
+    //Why does this stop lasers from working??? Because in change power accessed laser variable (bad)
+        EnablePlayer(gameHQ.playerStrength,gameHQ.playerPower);
+        //DisablePlayer();
+    }
+
+    // Update is called once per frame
+    void Update()
+    { 
+        //disable all behaviour if the player is dead
+        if(!bIsPlaying) return;        
+        CheckInput();
+    }
+
+    void CheckInput(){        
+        //Keyboard based input ----
+        if(Input.GetKeyDown(KeyCode.Q)){
+            // Q to increase speed
+            ChangeSpeed(1.0f);
+        }
+        if(Input.GetKeyDown(KeyCode.A)){
+            // A to decrease speed
+            ChangeSpeed(-1.0f);
+        }
+        if(Input.GetKeyDown(KeyCode.Space)){
+            FireLaser();
+        }
+        //Mouse button input...
+        if(Input.GetMouseButtonDown(0)){//maybe these should be left and right mouse buttons
+            // LEFT BUTTON for rotational correction boosters on the left side of ship (rotates clockwise)
+            playerRB.AddTorque(Vector3.forward * rotationalBoosters * speed/3,ForceMode.Impulse);//divided by 3 cos it feels right
+        }
+        if(Input.GetMouseButtonDown(1)){
+            // RIGHT BUTTON for rotational correction boosters on the right side of ship (rotates anti-clockwise)
+            playerRB.AddTorque(Vector3.forward * -rotationalBoosters * speed/3,ForceMode.Impulse);
+        }
+    }
+
+    void FixedUpdate(){
+        MoveMe(targetVector);
+        //this comes second as it does bounds checking which uses MoveMe() as well
+        UpdateTargetVector();
+    }
+
+    void LateUpdate(){
+        
+    }
+
+    public void DisablePlayer(){
+        bIsPlaying = false;
+        strengthSlider.gameObject.SetActive(false);
+    }
+
+    public void EnablePlayer(float aStrength, float aPower){
+        bIsPlaying = true;
+        strength = 0;
+        strengthSlider.maxValue = aStrength;
+        strengthSlider.value = aStrength;
+        sliderFill.SetActive(true);
+        strengthSlider.gameObject.SetActive(true);
+        AddStrengthLevel(aStrength);
+        speed = minSpeed;
+
+        AddPowerLevel(-power);
+        AddPowerLevel(aPower);
+    }
+
+    // Behaviour when hit by collider with isTrigger = true
+    private void OnTriggerEnter(Collider other){
+        if(other.CompareTag("ChargeUp")){
+            //Charge up so add laser power
+            AddPowerLevel(1);
+            Destroy(other.gameObject);
+        }
+        else if(other.CompareTag("StrengthUp")){
+            //add a bit of strenth
+            AddStrengthLevel(gameHQ.playerStrength/10f);
+            Destroy(other.gameObject);
+        }
+        else if(other.CompareTag("Star")){
+            //++ charge up code to go in here
+            //AddPowerLevel(-1);
+            AddDamageLevel(other.gameObject);
+            //Destroy(other.gameObject);
+        }
+    }
+
+    private void AddPowerLevel(float toAdd){
+        power += toAdd;
+        if(power <= 0){
+            //run out of power
+            power = 0;           
+        }
+        else if(power > maxPower){
+            power = maxPower;
+            //add a bit of strength
+            //AddStrengthLevel(5f);
+        }
+        else{bIsFiring = false;
+            
+        }
+        UpdatePowerIndicator();
+    }
+
+    private void UpdatePowerIndicator(){
+        //Frustratingly it took me ages to realise that I had to use localPosition
+        powerIndicator.transform.localPosition = new Vector3(0.0f,indicatorMoveStep*power,0.0f);
+    }
+
+    private void FireLaser(){//++ stop quick firing, perhaps remove a bit of power?
+        //lasers are at power level 1 when fully powered up
+        //going to remove this as it makes it too frustrating
+        //laserPower = power/laserPowerDivisor;
+        //check that we have power to fire
+        if(laserPower > 0 && !bIsFiring){
+            bIsFiring = true;
+            Vector3 gunPosition = new Vector3(transform.position.x,transform.position.y+1, transform.position.z-3);
+            GameObject shot = Instantiate(laser,gunPosition,transform.rotation);
+            //++ I want to have the lasers be affected by our current direction to add to playability
+            shot.GetComponent<Rigidbody>().AddForce(targetVector*speed/2,ForceMode.Impulse);
+            AddPowerLevel(-(maxPower/laserPowerUsageDivisor));
+            StartCoroutine("LimitShotsPerSecond");
+        }
+    }
+
+    IEnumerator LimitShotsPerSecond(){
+        yield return new WaitForSeconds(1/roundsPerSecond);
+        bIsFiring = false;
+    }
+    public float GetLaserPower(){
+        return laserPower;
+    }
+
+    //Behaviour when hit by Rigidbody with isTrigger = false in collider
+    private void OnCollisionEnter(Collision other){
+        // Non collider collision behaviour here
+        // These collisions cause damage based on the mass of other
+        if(other.gameObject.CompareTag("Planet")){
+            // You've bumped into a planet
+            AddDamageLevel(other.gameObject);
+        }
+        if(other.gameObject.CompareTag("Meteor")){
+            // You've bumped into a meteor
+            AddDamageLevel(other.gameObject);
+        }
+    }
+
+    //Implement damage which is based on the mass of what's hit you
+    //when it get's to zero it's GAME OVER
+    void AddDamageLevel(GameObject otherGO){
+        //How big was the hit? Basic sum based on mass and speed
+        float damage = speed + otherGO.GetComponent<MoveForward>().speed + otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
+        strength -= damage;
+        Debug.Log("Strength is now: "+strength);
+
+        //If we are completely damaged it's game over
+        if(strength <= 0){
+            gameHQ.GameOver();
+        }
+        sliderFill.SetActive(true);
+        strengthSlider.value = strength;
+    }
+    //the opposite of AddDamageLevel()
+    void AddStrengthLevel(float toAdd){
+        if(toAdd < 0){
+            Debug.LogError("Please use AddDamageLevel(gameobject) to remove strength");
+        }else{
+            strength += toAdd;
+            //maxes out at it's start value
+            if(strength >= gameHQ.playerStrength){
+                strength = gameHQ.playerStrength;
+            }            
+            sliderFill.SetActive(true);
+            strengthSlider.value = strength;
+        }
+    }
+
+    //returns multiplier for targetVector [bInXBounds,bInYBounds,1] and pushes gameObject back into bounds
+    Vector3 CheckForBounds(){
+        Vector3 temp = new Vector3(1,1,1);
+        //gone too wide so push us back into the middle and return [0,y,1] 
+        if(transform.position.x + targetVector.x > xBounds){
+            temp.x = 0;
+            MoveMe(Vector3.left);
+            //playerRB.AddForce(Vector3.left*speed,ForceMode.Impulse);
+        }else if(transform.position.x + targetVector.x < -xBounds){            
+            temp.x = 0;
+            MoveMe(Vector3.right);
+            //playerRB.AddForce(Vector3.right*speed,ForceMode.Impulse);
+        }
+        //gone too high or low so push us back into the middle and return[x,0,1]
+        if(transform.position.y + targetVector.y > yBounds){
+            temp.y = 0;
+            MoveMe(Vector3.down);
+            //playerRB.AddForce(Vector3.down,ForceMode.Impulse);
+        }else if(transform.position.y + targetVector.y < -yBounds){            
+            temp.y = 0;
+            MoveMe(Vector3.up);
+            //playerRB.AddForce(Vector3.up,ForceMode.Impulse);
+        }
+        return temp;
+    }
+
+    //the mouse motion control set up
+    void SetupTargetVector(){ 
+        screenModifier.x = Screen.width;
+        screenModifier.y = Screen.height;
+        //this is now the centre of the screen as it made more playability sense
+        originalMousePosition = screenModifier/2;//Input.mousePosition;
+        targetPosition.z = transform.position.z;
+        bTargetV = true;
+    }
+
+    //Modifies targetVector according to mouse position
+    void UpdateTargetVector(){
+        if(!bTargetV){
+            Debug.LogError("UpdateTargetVector cannot be called without first calling SetupTargetVector");
+            return;
+        }
+        //first take away where the mouse was at the start so it's just about where it is in relation 
+        targetVector = Input.mousePosition - originalMousePosition;
+        //make the movement a float (0.0-1.0) by dividing it by the screen size
+        targetVector.x /= screenModifier.x;
+        targetVector.y /= screenModifier.y;
+        //reverse the x-axis
+        targetVector.x = -targetVector.x;
+        targetVector.z = targetPosition.z - transform.position.z;
+        //multiply by speed so as you go faster the motion gets more twitchy
+        targetVector *= speed;
+        //check that we aren't going out of bounds and correct appropriately
+        //this is in this method so that MoveMe() could stay pure, it's used in the bounds check
+        //so would loop around pointlessly if moved to MoveMe() - don't do it!
+        Vector3 boundsCheck = CheckForBounds();
+        targetVector = Vector3.Scale(targetVector, boundsCheck);        
+    }
+
+    void MoveMe(Vector3 target){
+        playerRB.AddTorque(Vector3.forward * -(target.x/rotationalDamper),ForceMode.Impulse);
+        playerRB.AddForce(target*speed,ForceMode.Impulse);
+    }
+
+    //for other game objects to access but not effect
+    public float GetSpeed(){
+        return speed;
+    }
+
+    public float GetMaxSpeed(){
+        return maxSpeed;
+    }
+
+    public Vector3 GetBounds(){
+        return new Vector3(xBounds,yBounds,transform.position.z);
+    }
+
+    void ChangeSpeed(float n){
+        speed += n;
+        if(speed > maxSpeed) speed = maxSpeed;
+        if(speed < minSpeed) speed = minSpeed;
+        Debug.Log("Speed is: "+speed);
+        //deprecated as spawn is no longer based on time (InvokeRepeating)
+        //GameObject.Find("Spawn Manager").GetComponent<SpawnManager>().ReSpawn();
+    }
+}
