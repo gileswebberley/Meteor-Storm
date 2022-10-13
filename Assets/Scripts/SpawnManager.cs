@@ -9,7 +9,7 @@ public class SpawnManager : MonoBehaviour
     public GameObject[] powerPrefabs;
     public GameObject[] starPrefabs;
 
-    private bool bIsSpawning = true;
+    private bool bIsSpawning = false;
 
     private PlayerController player;
     private GameManager gameHQ;

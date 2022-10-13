@@ -7,7 +7,7 @@ using TMPro;
 public class GameManager : MonoBehaviour {
     public bool gameOver = false;
     public float playerPower = 10f;
-    public float playerStrength = 1000f;
+    public float playerStrength = 100f;
 
     private int difficulty = 1;
     //How long to wait before upping the difficulty, default 1 minute
@@ -26,9 +26,10 @@ public class GameManager : MonoBehaviour {
         gameOverUI = transform.Find("Game Over Page").gameObject;
         gameOverUI.SetActive(false);
         scoreText.gameObject.SetActive(false);
+        //finally got this woking after discovering about instantiating within the Awake()
         StartGame();
     }
-    //This runs after the Start() method of all the objects linked to, didn't work in Start()
+    //This runs before the Start() method, use to instantiate objects of the class
     void Awake(){
         spawn = GameObject.Find("Spawn Manager").GetComponent<SpawnManager>();
         player = GameObject.Find("Player").GetComponent<PlayerController>();

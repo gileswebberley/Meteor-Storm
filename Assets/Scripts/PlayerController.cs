@@ -50,12 +50,15 @@ public class PlayerController : MonoBehaviour
     private bool bIsFiring = false;
     private float roundsPerSecond = 10f;
     //Implement damage
-    private float strength = 0;
+    private float strength;
     private float maxStrength;
+
+    //trying to get the position to reset on Restart()
+    private Quaternion originalRotation;
 
     // Start is called before the first frame update
     void Start()
-    {        
+    {     
         //I have made the centre point the centre of the screen so this is a little redundant
         SetupTargetVector();
     }
@@ -72,12 +75,12 @@ public class PlayerController : MonoBehaviour
         damageText.SetActive(false);
         //get the fill of the strength slider so it can be updated
         sliderFill = strengthSlider.fillRect.gameObject;
-        //then hide the fill's parent to be shown when in "play" state
-        //strengthSlider.gameObject.SetActive(false);
         //set the divisor for lasers so on max power it has a value of 2 - deprecated for now (playability)
         laserPowerDivisor = maxPower/2f;
         //Get the rigidbody so we can add our forces for a more natural game experience
         playerRB = GetComponent<Rigidbody>();
+        //to reset on EnablePlayer() 
+        originalRotation = transform.rotation; 
     }
 
     // Update is called once per frame
@@ -125,20 +128,20 @@ public class PlayerController : MonoBehaviour
 
     public void DisablePlayer(){
         bIsPlaying = false;
+        //reset strength to zero
+        strength = 0;
         //a test whether I've grabbed the correct game object
         //yep, so it can hide the text and the indicator
         damageText.SetActive(false);
-        //strengthSlider.gameObject.SetActive(false);
     }
 
     public void EnablePlayer(float aStrength, float aPower){
         bIsPlaying = true;
-        //reset strength to zero
-        strength = 0;
+        playerRB.MoveRotation(originalRotation);
         //set the slider parameters to match the strength
         maxStrength = aStrength;
         strengthSlider.maxValue = maxStrength;
-        strengthSlider.gameObject.SetActive(true);
+        //strengthSlider.gameObject.SetActive(true);
         AddStrengthLevel(aStrength);
         //a test whether I've grabbed the correct game object
         //yep, so it can hide the text and the indicator
