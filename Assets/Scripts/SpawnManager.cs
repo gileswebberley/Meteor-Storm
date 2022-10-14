@@ -49,10 +49,12 @@ public class SpawnManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(!bIsSpawning) return;
         //If there are too few meteors then spawn another wave of everything
         //++ needs improving - now better with more speed variation in MoveForward
-        if(FindObjectsOfType<MeteorBehaviour>().Length < minSpawnAmount * gameHQ.GetDifficulty() && bIsSpawning){
+        if(FindObjectsOfType<MeteorBehaviour>().Length < minSpawnAmount * gameHQ.GetDifficulty()){
             SpawnAll();
+            Debug.Log("SpawnAll() called from Update()");
         }
     }
     
@@ -61,12 +63,14 @@ public class SpawnManager : MonoBehaviour
     }
 
     private void ResetSpawnZ(){
+        Debug.Log("ResetSpawn() called");
         maxSpawnZ /= spawnZMoveMultiplier;
         minSpawnZ -= maxSpawnZ;
     }
 
     public void RestartSpawn(){
         SpawnAll();
+        Debug.Log("SpawnAll() called from RestartSpawn()");
         //... then move the z spawn backwards as in Start()
         minSpawnZ += maxSpawnZ;
         maxSpawnZ *= spawnZMoveMultiplier;
@@ -74,6 +78,7 @@ public class SpawnManager : MonoBehaviour
     }
 
     public void StopSpawning(){
+        Debug.Log("StopSpawning() called");
         bIsSpawning = false;
         ResetSpawnZ();
     }

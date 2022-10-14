@@ -36,6 +36,7 @@ public class PlayerController : MonoBehaviour
     private float rotationalBoosters = 0.5f;
     //The number by which targetVector.x is divided within AddTorque()
     private float rotationalDamper = 30f;
+    private float originalAngularDrag;
 
     private float power = 0f;
     private float maxPower = 20f;
@@ -81,6 +82,7 @@ public class PlayerController : MonoBehaviour
         playerRB = GetComponent<Rigidbody>();
         //to reset on EnablePlayer() 
         originalRotation = transform.rotation; 
+        originalAngularDrag = playerRB.angularDrag;
     }
 
     // Update is called once per frame
@@ -129,30 +131,32 @@ public class PlayerController : MonoBehaviour
     public void DisablePlayer(){
         bIsPlaying = false;
         //reset strength to zero
-        strength = 0;
-        //a test whether I've grabbed the correct game object
+        //strength = 0;
         //yep, so it can hide the text and the indicator
         damageText.SetActive(false);
+        playerRB.angularDrag = originalAngularDrag + 20f;
     }
 
     public void EnablePlayer(float aStrength, float aPower){
-        bIsPlaying = true;
         playerRB.MoveRotation(originalRotation);
+        playerRB.angularDrag = originalAngularDrag;
         //set the slider parameters to match the strength
         maxStrength = aStrength;
         strengthSlider.maxValue = maxStrength;
-        //strengthSlider.gameObject.SetActive(true);
-        AddStrengthLevel(aStrength);
         //a test whether I've grabbed the correct game object
         //yep, so it can hide the text and the indicator
         damageText.SetActive(true);
+        strength = 0;
+        AddStrengthLevel(aStrength);
         speed = minSpeed;
         AddPowerLevel(-power);
         AddPowerLevel(aPower);
+        bIsPlaying = true;
     }
 
     // Behaviour when hit by collider with isTrigger = true
     private void OnTriggerEnter(Collider other){
+        if(!bIsPlaying)return;
         if(other.CompareTag("ChargeUp")){
             //Charge up so add laser power
             AddPowerLevel(1);
@@ -215,6 +219,7 @@ public class PlayerController : MonoBehaviour
 
     //Behaviour when hit by Rigidbody with isTrigger = false in collider
     private void OnCollisionEnter(Collision other){
+        if(!bIsPlaying)return;
         // Non collider collision behaviour here
         // These collisions cause damage based on the mass of other
         if(other.gameObject.CompareTag("Planet")){
@@ -233,10 +238,10 @@ public class PlayerController : MonoBehaviour
         //How big was the hit? Basic sum based on mass and speed
         float damage = speed + otherGO.GetComponent<MoveForward>().speed + otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
         strength -= damage;
-        Debug.Log("Strength is now: "+strength);
+        Debug.Log("DAMAGE: Strength is now: "+strength);
 
         //If we are completely damaged it's game over
-        if(strength <= 0){
+        if(strength <= 0 && bIsPlaying){
             gameHQ.GameOver();
             strength = 0;
         }
@@ -247,7 +252,8 @@ public class PlayerController : MonoBehaviour
     void AddStrengthLevel(float toAdd){
         if(toAdd < 0){
             Debug.LogError("Please use AddDamageLevel(gameobject) to remove strength");
-        }else{
+        }
+        else{
             strength += toAdd;
             //maxes out at it's start value
             if(strength >= maxStrength){
@@ -255,6 +261,7 @@ public class PlayerController : MonoBehaviour
             }            
             sliderFill.SetActive(true);
             strengthSlider.value = strength;
+            Debug.Log("ADD: Strength is now: "+strength);
         }
     }
 
