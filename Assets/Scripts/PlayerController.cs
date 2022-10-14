@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviour
     private float minSpeed = 5f;
     private float maxSpeed = 20f;
     //the amount of torque added by imaginary booster rockets (help get control back when spinning)using System.Collections;
-    private float rotationalBoosters = 0.5f;
+    private float rotationalBoosters = 0.75f;
     //The number by which targetVector.x is divided within AddTorque()
     private float rotationalDamper = 30f;
     private float originalAngularDrag;
@@ -109,11 +109,11 @@ public class PlayerController : MonoBehaviour
         //Mouse button input...
         if(Input.GetMouseButtonDown(0)){//maybe these should be left and right mouse buttons
             // LEFT BUTTON for rotational correction boosters on the left side of ship (rotates clockwise)
-            playerRB.AddTorque(Vector3.forward * rotationalBoosters * speed/3,ForceMode.Impulse);//divided by 3 cos it feels right
+            playerRB.AddTorque(Vector3.forward * rotationalBoosters * speed,ForceMode.Impulse);//divided by 3 cos it feels right
         }
         if(Input.GetMouseButtonDown(1)){
             // RIGHT BUTTON for rotational correction boosters on the right side of ship (rotates anti-clockwise)
-            playerRB.AddTorque(Vector3.forward * -rotationalBoosters * speed/3,ForceMode.Impulse);
+            playerRB.AddTorque(Vector3.forward * -rotationalBoosters * speed,ForceMode.Impulse);
         }
     }
 
@@ -130,8 +130,6 @@ public class PlayerController : MonoBehaviour
 
     public void DisablePlayer(){
         bIsPlaying = false;
-        //reset strength to zero
-        //strength = 0;
         //yep, so it can hide the text and the indicator
         damageText.SetActive(false);
         playerRB.angularDrag = originalAngularDrag + 20f;
@@ -325,7 +323,7 @@ public class PlayerController : MonoBehaviour
     }
 
     void MoveMe(Vector3 target){
-        playerRB.AddTorque(Vector3.forward * -(target.x/rotationalDamper),ForceMode.Impulse);
+        playerRB.AddTorque(Vector3.forward * -((target.x*speed)/rotationalDamper),ForceMode.Impulse);
         playerRB.AddForce(target*speed,ForceMode.Impulse);
     }
 
