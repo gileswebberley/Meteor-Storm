@@ -50,7 +50,7 @@ public class SpawnManager : MonoBehaviour
     void Update()
     {
         //If there are too few meteors then spawn another wave of everything
-        //++ needs improving - now better with more speed variation
+        //++ needs improving - now better with more speed variation in MoveForward
         if(FindObjectsOfType<MeteorBehaviour>().Length < minSpawnAmount * gameHQ.GetDifficulty() && bIsSpawning){
             SpawnAll();
         }
@@ -79,10 +79,11 @@ public class SpawnManager : MonoBehaviour
     }
 
     void SpawnAll(){
+        int diff = gameHQ.GetDifficulty();
         //make it based on a difficulty, so as it gets more difficult you get more meteors and less power ups
-        SpawnMeteors(minSpawnAmount*gameHQ.GetDifficulty(),maxSpawnAmount*gameHQ.GetDifficulty());
+        SpawnMeteors(minSpawnAmount*diff,maxSpawnAmount*diff);
         //we want this to be controllable so less as it gets harder
-        SpawnPowerUps(minSpawnAmount/gameHQ.GetDifficulty(),maxSpawnAmount/gameHQ.GetDifficulty());
+        SpawnPowerUps(minSpawnAmount/diff,maxSpawnAmount/diff);
         //both of these are mainly for the enviromental aesthetic
         //++make them damage massively if hit 
         SpawnPlanets(1,3);
