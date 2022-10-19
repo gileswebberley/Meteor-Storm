@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     public Slider strengthSlider;
     private GameObject sliderFill;
     private GameObject damageText;
+    //very important boolean
     private bool bIsPlaying = false;
     [SerializeField] private GameObject laser;
 
@@ -36,6 +37,7 @@ public class PlayerController : MonoBehaviour
     private float rotationalBoosters = 0.75f;
     //The number by which targetVector.x is divided within AddTorque()
     private float rotationalDamper = 30f;
+    //now using to reset player on restart
     private float originalAngularDrag;
 
     private float power = 0f;
@@ -74,6 +76,7 @@ public class PlayerController : MonoBehaviour
         gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
         damageText = transform.Find("Strength").gameObject;
         damageText.SetActive(false);
+        //Strength slider is attached in the Editor
         //get the fill of the strength slider so it can be updated
         sliderFill = strengthSlider.fillRect.gameObject;
         //set the divisor for lasers so on max power it has a value of 2 - deprecated for now (playability)
@@ -154,6 +157,7 @@ public class PlayerController : MonoBehaviour
 
     // Behaviour when hit by collider with isTrigger = true
     private void OnTriggerEnter(Collider other){
+        //disable all behaviour if the player is dead
         if(!bIsPlaying)return;
         if(other.CompareTag("ChargeUp")){
             //Charge up so add laser power
@@ -217,6 +221,7 @@ public class PlayerController : MonoBehaviour
 
     //Behaviour when hit by Rigidbody with isTrigger = false in collider
     private void OnCollisionEnter(Collision other){
+        //disable all behaviour if the player is dead
         if(!bIsPlaying)return;
         // Non collider collision behaviour here
         // These collisions cause damage based on the mass of other
