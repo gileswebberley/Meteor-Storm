@@ -9,7 +9,7 @@ public class SpawnManager : MonoBehaviour
     public GameObject[] powerPrefabs;
     public GameObject[] starPrefabs;
 
-    private bool bIsSpawning = true;
+    private bool bIsSpawning = false;
 
     private PlayerController player;
     private GameManager gameHQ;
@@ -30,31 +30,31 @@ public class SpawnManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
+
+        //RestartSpawn();
+    }
+
+    void Awake(){
         //reference to player
         player = GameObject.Find("Player").GetComponent<PlayerController>();
+        maxSpawnY = player.GetBounds().y;
+        //Debug.Log("maxSpawnY: "+maxSpawnY);
+        maxSpawnX = player.GetBounds().x;
+        //Debug.Log("maxSpawnX: "+maxSpawnX);
         //reference to game manager
         gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
-        //maxSpawnTime = player.GetMaxSpeed();
-        //spawnTime = maxSpawnTime/player.GetSpeed();
-        maxSpawnY = player.GetBounds().y;
-        //maxSpawnY *= 2;
-        Debug.Log("maxSpawnY: "+maxSpawnY);
-        maxSpawnX = player.GetBounds().x;
-        //maxSpawnX *= 2;
-        Debug.Log("maxSpawnX: "+maxSpawnX);
-
-        RestartSpawn();
-        //spawning no longer based on time
-        //InvokeRepeating("SpawnAll",spawnTime,spawnTime);
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(!bIsSpawning) return;
         //If there are too few meteors then spawn another wave of everything
-        //++ needs improving - now better with more speed variation
-        if(FindObjectsOfType<MeteorBehaviour>().Length < minSpawnAmount * gameHQ.GetDifficulty() && bIsSpawning){
+        //++ needs improving - now better with more speed variation in MoveForward
+        if(FindObjectsOfType<MeteorBehaviour>().Length < minSpawnAmount * gameHQ.GetDifficulty()){
             SpawnAll();
+            Debug.Log("SpawnAll() called from Update()");
         }
     }
     
@@ -63,12 +63,14 @@ public class SpawnManager : MonoBehaviour
     }
 
     private void ResetSpawnZ(){
+        Debug.Log("ResetSpawn() called");
         maxSpawnZ /= spawnZMoveMultiplier;
         minSpawnZ -= maxSpawnZ;
     }
 
     public void RestartSpawn(){
         SpawnAll();
+        Debug.Log("SpawnAll() called from RestartSpawn()");
         //... then move the z spawn backwards as in Start()
         minSpawnZ += maxSpawnZ;
         maxSpawnZ *= spawnZMoveMultiplier;
@@ -76,15 +78,17 @@ public class SpawnManager : MonoBehaviour
     }
 
     public void StopSpawning(){
+        Debug.Log("StopSpawning() called");
         bIsSpawning = false;
         ResetSpawnZ();
     }
 
     void SpawnAll(){
+        int diff = gameHQ.GetDifficulty();
         //make it based on a difficulty, so as it gets more difficult you get more meteors and less power ups
-        SpawnMeteors(minSpawnAmount*gameHQ.GetDifficulty(),maxSpawnAmount*gameHQ.GetDifficulty());
+        SpawnMeteors(minSpawnAmount*diff,maxSpawnAmount*diff);
         //we want this to be controllable so less as it gets harder
-        SpawnPowerUps(minSpawnAmount/gameHQ.GetDifficulty(),maxSpawnAmount/gameHQ.GetDifficulty());
+        SpawnPowerUps(minSpawnAmount/diff,maxSpawnAmount/diff);
         //both of these are mainly for the enviromental aesthetic
         //++make them damage massively if hit 
         SpawnPlanets(1,3);

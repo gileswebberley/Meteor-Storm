@@ -8,7 +8,8 @@ public class PlayerController : MonoBehaviour
     public Slider strengthSlider;
     private GameObject sliderFill;
     private GameObject damageText;
-    private bool bIsPlaying = true;
+    //very important boolean
+    private bool bIsPlaying = false;
     [SerializeField] private GameObject laser;
 
     private GameManager gameHQ;
@@ -33,9 +34,11 @@ public class PlayerController : MonoBehaviour
     private float minSpeed = 5f;
     private float maxSpeed = 20f;
     //the amount of torque added by imaginary booster rockets (help get control back when spinning)using System.Collections;
-    private float rotationalBoosters = 0.5f;
+    private float rotationalBoosters = 0.75f;
     //The number by which targetVector.x is divided within AddTorque()
     private float rotationalDamper = 30f;
+    //now using to reset player on restart
+    private float originalAngularDrag;
 
     private float power = 0f;
     private float maxPower = 20f;
@@ -50,35 +53,39 @@ public class PlayerController : MonoBehaviour
     private bool bIsFiring = false;
     private float roundsPerSecond = 10f;
     //Implement damage
-    private float strength = 0;
+    private float strength;
+    private float maxStrength;
+
+    //trying to get the position to reset on Restart()
+    private Quaternion originalRotation;
 
     // Start is called before the first frame update
     void Start()
-    {
+    {     
+        //I have made the centre point the centre of the screen so this is a little redundant
+        SetupTargetVector();
+    }
+
+    //Use Awake to get all your references (instantiate objects) to avoid the dreaded NullReferenceExeption
+    void Awake(){
         //use transform.Find for children game objects
         powerIndicator = transform.Find("Power Level").gameObject;
         //the float is the distance to move the power cylinder forwards to create the nice effect
         indicatorMoveStep = -0.5f / maxPower;
-        //set the divisor for lasers so on max power it has a value of 2
+        //connect with game manager
+        gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
+        damageText = transform.Find("Strength").gameObject;
+        damageText.SetActive(false);
+        //Strength slider is attached in the Editor
+        //get the fill of the strength slider so it can be updated
+        sliderFill = strengthSlider.fillRect.gameObject;
+        //set the divisor for lasers so on max power it has a value of 2 - deprecated for now (playability)
         laserPowerDivisor = maxPower/2f;
-        //set up the power level indicator by calling with a zero argument
-        //AddPowerLevel(0);
-        //I have made the centre point the centre of the screen so this is a little redundant
-        SetupTargetVector();
         //Get the rigidbody so we can add our forces for a more natural game experience
         playerRB = GetComponent<Rigidbody>();
-        gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
-        //power = gameHQ.playerPower;
-        //strength = gameHQ.playerStrength;
-        // strengthSlider.maxValue = strength;
-        // strengthSlider.value = strength;
-
-        sliderFill = strengthSlider.fillRect.gameObject;
-        //sliderFill.SetActive(true);
-        strengthSlider.gameObject.SetActive(false);
-    //Why does this stop lasers from working??? Because in change power accessed laser variable (bad)
-        EnablePlayer(gameHQ.playerStrength,gameHQ.playerPower);
-        //DisablePlayer();
+        //to reset on EnablePlayer() 
+        originalRotation = transform.rotation; 
+        originalAngularDrag = playerRB.angularDrag;
     }
 
     // Update is called once per frame
@@ -105,15 +112,16 @@ public class PlayerController : MonoBehaviour
         //Mouse button input...
         if(Input.GetMouseButtonDown(0)){//maybe these should be left and right mouse buttons
             // LEFT BUTTON for rotational correction boosters on the left side of ship (rotates clockwise)
-            playerRB.AddTorque(Vector3.forward * rotationalBoosters * speed/3,ForceMode.Impulse);//divided by 3 cos it feels right
+            playerRB.AddTorque(Vector3.forward * rotationalBoosters * speed,ForceMode.Impulse);
         }
         if(Input.GetMouseButtonDown(1)){
             // RIGHT BUTTON for rotational correction boosters on the right side of ship (rotates anti-clockwise)
-            playerRB.AddTorque(Vector3.forward * -rotationalBoosters * speed/3,ForceMode.Impulse);
+            playerRB.AddTorque(Vector3.forward * -rotationalBoosters * speed,ForceMode.Impulse);
         }
     }
 
     void FixedUpdate(){
+        if(!bIsPlaying) return; 
         MoveMe(targetVector);
         //this comes second as it does bounds checking which uses MoveMe() as well
         UpdateTargetVector();
@@ -125,25 +133,32 @@ public class PlayerController : MonoBehaviour
 
     public void DisablePlayer(){
         bIsPlaying = false;
-        strengthSlider.gameObject.SetActive(false);
+        //yep, so it can hide the text and the indicator
+        damageText.SetActive(false);
+        playerRB.angularDrag = originalAngularDrag + 20f;
     }
 
     public void EnablePlayer(float aStrength, float aPower){
-        bIsPlaying = true;
+        playerRB.MoveRotation(originalRotation);
+        playerRB.angularDrag = originalAngularDrag;
+        //set the slider parameters to match the strength
+        maxStrength = aStrength;
+        strengthSlider.maxValue = maxStrength;
+        //a test whether I've grabbed the correct game object
+        //yep, so it can hide the text and the indicator
+        damageText.SetActive(true);
         strength = 0;
-        strengthSlider.maxValue = aStrength;
-        strengthSlider.value = aStrength;
-        sliderFill.SetActive(true);
-        strengthSlider.gameObject.SetActive(true);
         AddStrengthLevel(aStrength);
         speed = minSpeed;
-
         AddPowerLevel(-power);
         AddPowerLevel(aPower);
+        bIsPlaying = true;
     }
 
     // Behaviour when hit by collider with isTrigger = true
     private void OnTriggerEnter(Collider other){
+        //disable all behaviour if the player is dead
+        if(!bIsPlaying)return;
         if(other.CompareTag("ChargeUp")){
             //Charge up so add laser power
             AddPowerLevel(1);
@@ -153,12 +168,9 @@ public class PlayerController : MonoBehaviour
             //add a bit of strenth
             AddStrengthLevel(gameHQ.playerStrength/10f);
             Destroy(other.gameObject);
-        }
-        else if(other.CompareTag("Star")){
-            //++ charge up code to go in here
-            //AddPowerLevel(-1);
+        }else if(other.CompareTag("Star")){
+            //death by a star, damage is based on mass in rigidbody
             AddDamageLevel(other.gameObject);
-            //Destroy(other.gameObject);
         }
     }
 
@@ -170,12 +182,8 @@ public class PlayerController : MonoBehaviour
         }
         else if(power > maxPower){
             power = maxPower;
-            //add a bit of strength
-            //AddStrengthLevel(5f);
         }
-        else{bIsFiring = false;
-            
-        }
+
         UpdatePowerIndicator();
     }
 
@@ -184,10 +192,13 @@ public class PlayerController : MonoBehaviour
         powerIndicator.transform.localPosition = new Vector3(0.0f,indicatorMoveStep*power,0.0f);
     }
 
-    private void FireLaser(){//++ stop quick firing, perhaps remove a bit of power?
+    private void FireLaser(){
+        //++ LimitShotsPerSecond() introduced
+
         //lasers are at power level 1 when fully powered up
         //going to remove this as it makes it too frustrating
         //laserPower = power/laserPowerDivisor;
+
         //check that we have power to fire
         if(laserPower > 0 && !bIsFiring){
             bIsFiring = true;
@@ -195,7 +206,9 @@ public class PlayerController : MonoBehaviour
             GameObject shot = Instantiate(laser,gunPosition,transform.rotation);
             //++ I want to have the lasers be affected by our current direction to add to playability
             shot.GetComponent<Rigidbody>().AddForce(targetVector*speed/2,ForceMode.Impulse);
+            //lasers use the power
             AddPowerLevel(-(maxPower/laserPowerUsageDivisor));
+            //pause trigger based on roundsPerSecond
             StartCoroutine("LimitShotsPerSecond");
         }
     }
@@ -210,9 +223,11 @@ public class PlayerController : MonoBehaviour
 
     //Behaviour when hit by Rigidbody with isTrigger = false in collider
     private void OnCollisionEnter(Collision other){
+        //disable all behaviour if the player is dead
+        if(!bIsPlaying)return;
         // Non collider collision behaviour here
         // These collisions cause damage based on the mass of other
-        if(other.gameObject.CompareTag("Planet")){
+        if(other.gameObject.CompareTag("Planet")){//why are these if statements here?
             // You've bumped into a planet
             AddDamageLevel(other.gameObject);
         }
@@ -228,11 +243,13 @@ public class PlayerController : MonoBehaviour
         //How big was the hit? Basic sum based on mass and speed
         float damage = speed + otherGO.GetComponent<MoveForward>().speed + otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
         strength -= damage;
-        Debug.Log("Strength is now: "+strength);
+        Debug.Log("DAMAGE: Strength is now: "+strength);
 
         //If we are completely damaged it's game over
-        if(strength <= 0){
+        if(strength <= 0 && bIsPlaying){
+            //GameOver calls DisablePlayer()
             gameHQ.GameOver();
+            strength = 0;
         }
         sliderFill.SetActive(true);
         strengthSlider.value = strength;
@@ -241,14 +258,16 @@ public class PlayerController : MonoBehaviour
     void AddStrengthLevel(float toAdd){
         if(toAdd < 0){
             Debug.LogError("Please use AddDamageLevel(gameobject) to remove strength");
-        }else{
+        }
+        else{
             strength += toAdd;
             //maxes out at it's start value
-            if(strength >= gameHQ.playerStrength){
-                strength = gameHQ.playerStrength;
+            if(strength >= maxStrength){
+                strength = maxStrength;
             }            
             sliderFill.SetActive(true);
             strengthSlider.value = strength;
+            Debug.Log("ADD: Strength is now: "+strength);
         }
     }
 
@@ -312,7 +331,7 @@ public class PlayerController : MonoBehaviour
     }
 
     void MoveMe(Vector3 target){
-        playerRB.AddTorque(Vector3.forward * -(target.x/rotationalDamper),ForceMode.Impulse);
+        playerRB.AddTorque(Vector3.forward * -((target.x*speed)/rotationalDamper),ForceMode.Impulse);
         playerRB.AddForce(target*speed,ForceMode.Impulse);
     }
 
