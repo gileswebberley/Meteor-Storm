@@ -112,7 +112,7 @@ public class PlayerController : MonoBehaviour
         //Mouse button input...
         if(Input.GetMouseButtonDown(0)){//maybe these should be left and right mouse buttons
             // LEFT BUTTON for rotational correction boosters on the left side of ship (rotates clockwise)
-            playerRB.AddTorque(Vector3.forward * rotationalBoosters * speed,ForceMode.Impulse);//divided by 3 cos it feels right
+            playerRB.AddTorque(Vector3.forward * rotationalBoosters * speed,ForceMode.Impulse);
         }
         if(Input.GetMouseButtonDown(1)){
             // RIGHT BUTTON for rotational correction boosters on the right side of ship (rotates anti-clockwise)
@@ -183,10 +183,7 @@ public class PlayerController : MonoBehaviour
         else if(power > maxPower){
             power = maxPower;
         }
-        else{
-            //bIsFiring = false;//why is this here??
-            
-        }
+
         UpdatePowerIndicator();
     }
 
@@ -195,10 +192,13 @@ public class PlayerController : MonoBehaviour
         powerIndicator.transform.localPosition = new Vector3(0.0f,indicatorMoveStep*power,0.0f);
     }
 
-    private void FireLaser(){//++ stop quick firing, perhaps remove a bit of power?
+    private void FireLaser(){
+        //++ LimitShotsPerSecond() introduced
+
         //lasers are at power level 1 when fully powered up
         //going to remove this as it makes it too frustrating
         //laserPower = power/laserPowerDivisor;
+
         //check that we have power to fire
         if(laserPower > 0 && !bIsFiring){
             bIsFiring = true;
@@ -206,7 +206,9 @@ public class PlayerController : MonoBehaviour
             GameObject shot = Instantiate(laser,gunPosition,transform.rotation);
             //++ I want to have the lasers be affected by our current direction to add to playability
             shot.GetComponent<Rigidbody>().AddForce(targetVector*speed/2,ForceMode.Impulse);
+            //lasers use the power
             AddPowerLevel(-(maxPower/laserPowerUsageDivisor));
+            //pause trigger based on roundsPerSecond
             StartCoroutine("LimitShotsPerSecond");
         }
     }
@@ -225,7 +227,7 @@ public class PlayerController : MonoBehaviour
         if(!bIsPlaying)return;
         // Non collider collision behaviour here
         // These collisions cause damage based on the mass of other
-        if(other.gameObject.CompareTag("Planet")){
+        if(other.gameObject.CompareTag("Planet")){//why are these if statements here?
             // You've bumped into a planet
             AddDamageLevel(other.gameObject);
         }
@@ -245,6 +247,7 @@ public class PlayerController : MonoBehaviour
 
         //If we are completely damaged it's game over
         if(strength <= 0 && bIsPlaying){
+            //GameOver calls DisablePlayer()
             gameHQ.GameOver();
             strength = 0;
         }

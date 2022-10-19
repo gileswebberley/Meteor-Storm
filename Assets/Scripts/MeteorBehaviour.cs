@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+//using System;
 using UnityEngine;
 
 public class MeteorBehaviour : MonoBehaviour
@@ -41,10 +42,10 @@ public class MeteorBehaviour : MonoBehaviour
             if(power <= 0){
                 //can't get the particle system to work :( ++ There we go, simply use Instantiate rather than try to play it
                 Instantiate(explodePS,transform.position, transform.rotation);
-                //destroyed
-                Destroy(gameObject);
                 //add my original power to the player score
                 gameHQ.UpdateScore(((int)startPower));//warning casting to int
+                //destroyed
+                Destroy(gameObject);
             }
         }
     }

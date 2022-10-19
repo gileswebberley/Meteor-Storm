@@ -7,7 +7,7 @@ using TMPro;
 public class GameManager : MonoBehaviour {
     private bool gameOver = false;
     public float playerPower = 10f;
-    public float playerStrength = 100f;
+    public float playerStrength = 1000f;
 
     private int difficulty = 1;
     private int maxDifficulty = 3;
@@ -44,7 +44,7 @@ public class GameManager : MonoBehaviour {
     void Update(){
 
     }
-
+    //This runs once per StartCoroutine() call
     IEnumerator DifficultyChangeTimer(){
         //don't run if difficulty is already topped out
         if(difficulty >= maxDifficulty)yield break;
@@ -59,7 +59,8 @@ public class GameManager : MonoBehaviour {
     public int GetDifficulty(){
         return difficulty;
     }
-    //Difficulty bounded to [1..3]
+
+    //Difficulty bounded to [1..maxDifficulty]
     public void SetDifficulty(int aDif){
         difficulty = aDif;
         if(difficulty < 1){
@@ -69,13 +70,17 @@ public class GameManager : MonoBehaviour {
             difficulty = maxDifficulty;
             //stop wasting proccesing if difficulty is already at it's highest
             //StopCoroutine("DifficultyChangeTimer");
+            //actually made more sense to have this functionality in the
+            //DifficultyChangeTimer() enumerator
         }
         Debug.Log("DIfficulty is now: "+difficulty);
     }
 
     public void UpdateScore(int toAdd){
         score += toAdd;
-        scoreText.text = "score: "+score;
+        //using c# "string interpolation" by using the $ before the string values can be 
+        //put directly into the string without concatenation by placing them in {}
+        scoreText.text = $"score:{score}";//+score;
     }
 
     public void GameOver(){
@@ -95,9 +100,10 @@ public class GameManager : MonoBehaviour {
         //to chek that starting difficulty is within range
         SetDifficulty(difficulty);
         StartCoroutine("DifficultyChangeTimer");
-        //I don't know why this makes everything stop working, 
+        // -- I don't know why this makes everything stop working, 
         //only change is calling from here rather than from the 
-        //Start() in each of the class definitions - use Awake()
+        //Start() in each of the class definitions
+        // ++ use Awake()
         player.EnablePlayer(playerStrength,playerPower);
         spawn.RestartSpawn();
     }
