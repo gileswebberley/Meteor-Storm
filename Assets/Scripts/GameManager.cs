@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour {
     //This runs before the Start() method, use to instantiate objects of the class
     void Awake(){
         gameOverUI = transform.Find("Game Over Page").gameObject;
+        //in oop terms is this a form of Aggregation?
         spawn = GameObject.Find("Spawn Manager").GetComponent<SpawnManager>();
         player = GameObject.Find("Player").GetComponent<PlayerController>();
         if(spawn == null || player == null){

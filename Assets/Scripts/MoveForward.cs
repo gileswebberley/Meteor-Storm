@@ -34,7 +34,7 @@ public class MoveForward : MonoBehaviour
         //transform.Translate(Vector3.forward*(speed*player.GetSpeed())*Time.deltaTime);
 
         //check that we are still in view (within z-bounds)
-        if(transform.position.z > player.transform.position.z + 10 || transform.position.z < spawn.GetMaxSpawnZ()){
+        if(transform.position.z > player.transform.position.z + 10 || transform.position.z < spawn.MaxSpawnZ){
             Destroy(gameObject);
         }
     }
