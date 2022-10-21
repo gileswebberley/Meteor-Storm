@@ -10,7 +10,7 @@ public class MoveForward : MonoBehaviour
     //to discover the speed of the player 
     private PlayerController player;
     //to discover the z bounds that is being spawned at so they die if they go further
-    private SpawnManager spawn;
+    private ISpawnable spawn;
     private Rigidbody thisRB;
 
     // Start is called before the first frame update
@@ -34,7 +34,7 @@ public class MoveForward : MonoBehaviour
         //transform.Translate(Vector3.forward*(speed*player.GetSpeed())*Time.deltaTime);
 
         //check that we are still in view (within z-bounds)
-        if(transform.position.z > player.transform.position.z + 10 || transform.position.z < spawn.spawnProperties.MaxSpawnZ){
+        if(transform.position.z > player.transform.position.z + 10 || transform.position.z < spawn.maxSpawnZ){
             Destroy(gameObject);
         }
     }

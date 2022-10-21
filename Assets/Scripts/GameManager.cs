@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private TextMeshProUGUI scoreText;
 
      //reference to Spawn Manager
-     private SpawnManager spawn;
+     private ISpawnable spawn;
      //reference to the Player
      private PlayerController player;
      //Game Over page with restart button
