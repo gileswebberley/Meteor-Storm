@@ -27,12 +27,6 @@ public class MeteorBehaviour : MonoBehaviour
         GetComponent<Rigidbody>().AddTorque(Random.Range(-5,5),Random.Range(-5,5),Random.Range(-5,5));
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     void OnTriggerEnter(Collider other){
         if(other.CompareTag("LaserShot")){
             //hit by a laser, check how powerful it is
