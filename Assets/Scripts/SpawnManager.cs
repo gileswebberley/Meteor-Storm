@@ -20,58 +20,17 @@ public class SpawnManager : SpawnerBase
     //should player be available through the GameManager rather than directly from all these classes?
     private PlayerController player;
     private GameManager gameHQ;
-    //public SpawnProperties spawnProperties { get => spawnProperties; protected set => spawnProperties = value;}
-
-    //spawnProperties = new SpawnProperties;
-
-    //[] directive makes it available in the Editor Inspector
-    //[SerializeField] private int minSpawnAmount = 5;//used for spawn triggering
-    //[SerializeField] private int maxSpawnAmount = 20;
     //No longer time based spawning but still here for now - maybe this should be a seperate TimeSpawnable interface?
     private float maxSpawnTime;
     private float spawnTime;
-
-    // private float _minSpawnZ = -100f;
-    // //Encapsulation with value checking through Property Methods
-    // public float _minSpawnZ {
-    //     get {return _minSpawnZ;} 
-    //     protected set {
-    //                 if(value <= 0){ 
-    //                     //make sure it's a negative value
-    //                     _minSpawnZ = value;
-    //                 }else{
-    //                     //assume user forgot the minus sign
-    //                     _minSpawnZ = value * -1;
-    //                 }
-    //             }
-    // }
-    // private float maxSpawnZ = -400f;
-    // public float maxSpawnZ {
-    //     get {return maxSpawnZ;} 
-    //     protected set {
-    //                 if(value <= 0){ 
-    //                     //make sure it's a negative value
-    //                     maxSpawnZ = value;
-    //                 }else{
-    //                     //assume user forgot the minus sign
-    //                     maxSpawnZ = value * -1;
-    //                 }
-    //             }
-    // }
     //This is also vital for Spawnable behaviour but 
     //Interfaces are for "implementing peripheral abilities" - GeeksForGeeks
-    private float spawnZMoveMultiplier = 2f;
-
-    //An example of using C# Properties to encapsulate a field
-    // private float maxSpawnX;
-    // //this allows public visibility as MaxSpawnX but is protected access for setting (within class or derived classes)
-    // public float MaxSpawnX { get => maxSpawnX; protected set => maxSpawnX = value; }
-    // private float maxSpawnY;
-    // public float MaxSpawnY { get => maxSpawnY; protected set => maxSpawnY = value; }
+    
 
     //so we can move the z-index after first birth
-    //private bool bPlanetsSpawned = false, bMeteorsSpawned = false, bStarsSpawned = false, bPowerSpawned = false;
-    // Start is called before the first frame update
+    private float spawnZMoveMultiplier = 2f;
+    
+
     void Start()
     {
         
@@ -80,6 +39,8 @@ public class SpawnManager : SpawnerBase
     }
 
     void Awake(){
+        minSpawnX = -maxSpawnX;
+        minSpawnY = -maxSpawnY;
         Debug.Log("SpawnManager Awake()");
         //reference to player
         player = GameObject.Find("Player").GetComponent<PlayerController>();
@@ -111,20 +72,28 @@ public class SpawnManager : SpawnerBase
         minSpawnZ -= maxSpawnZ;
     }
 
-    //Public interface of Spawnable
-    public override void RestartSpawn(){
+    public override void StartSpawn(){
         SpawnAll();
-        Debug.Log("SpawnAll() called from RestartSpawn() : bIsSpawning = "+bIsSpawning);
+        Debug.Log("SpawnAll() called from StartSpawn() ");
         //... then move the z spawn backwards as in Start()
         minSpawnZ += maxSpawnZ;
         maxSpawnZ *= spawnZMoveMultiplier;
         bIsSpawning = true;
+        bHasStarted = true;
+    }
+
+    //Public interface of Spawnable
+    public override void RestartSpawn(){
+        if(bHasStarted){
+            ResetSpawnZ();
+        }
+        StartSpawn();
     }
     //Public interface of Spawnable
     public override void StopSpawning(){
         Debug.Log("StopSpawning() called");
         bIsSpawning = false;
-        ResetSpawnZ();
+        //ResetSpawnZ();
     }
     //Abstraction that every Spawnable must implement - this should be split into SpawnEnemies and SpawnBonuses
     public override void SpawnAll(){
@@ -145,10 +114,9 @@ public class SpawnManager : SpawnerBase
         //Planets can be outside of bounds for environmental decoration        
         for(int i = 0; i < totalSpawn; i++){
             int randomSelection = Random.Range(0,planetPrefabs.Length);
-            float randomX = Random.Range(-maxSpawnX*10,maxSpawnX*10);
-            float randomY = Random.Range(-maxSpawnY*10,maxSpawnY*10);
-            float randomZ = Random.Range(minSpawnZ,maxSpawnZ);
-            Vector3 birthPos = new Vector3(randomX,randomY,randomZ);
+            //use the utility function inherited from SpawnerBase
+            Vector3 birthPos = GetRandomStartPosition(10f);
+            birthPos.z /= 10f;
             Instantiate(planetPrefabs[randomSelection],birthPos,planetPrefabs[randomSelection].transform.rotation);
         }
     }
@@ -158,10 +126,7 @@ public class SpawnManager : SpawnerBase
         
         for(int i = 0; i < totalSpawn; i++){
             int randomSelection = Random.Range(0,meteorPrefabs.Length);
-            float randomX = Random.Range(-maxSpawnX,maxSpawnX);
-            float randomY = Random.Range(-maxSpawnY,maxSpawnY);
-            float randomZ = Random.Range(minSpawnZ,maxSpawnZ);
-            Vector3 birthPos = new Vector3(randomX,randomY,randomZ);
+            Vector3 birthPos = GetRandomStartPosition();
             Instantiate(meteorPrefabs[randomSelection],birthPos,meteorPrefabs[randomSelection].transform.rotation);
         }
     }
@@ -171,10 +136,8 @@ public class SpawnManager : SpawnerBase
         //Stars can be outside of bounds for environmental decoration
         for(int i = 0; i < totalSpawn; i++){
             int randomSelection = Random.Range(0,starPrefabs.Length);
-            float randomX = Random.Range(-maxSpawnX*10,maxSpawnX*10);
-            float randomY = Random.Range(-maxSpawnY*10,maxSpawnY*10);
-            float randomZ = Random.Range(minSpawnZ,maxSpawnZ);
-            Vector3 birthPos = new Vector3(randomX,randomY,randomZ);
+            Vector3 birthPos = GetRandomStartPosition(10f);
+            birthPos.z /= 10f;
             Instantiate(starPrefabs[randomSelection],birthPos,starPrefabs[randomSelection].transform.rotation);
         }
     }
@@ -183,11 +146,9 @@ public class SpawnManager : SpawnerBase
         
         for(int i = 0; i < totalSpawn; i++){
             int randomSelection = Random.Range(0,powerPrefabs.Length);
-            float randomX = Random.Range(-maxSpawnX,maxSpawnX);
-            float randomY = Random.Range(-maxSpawnY,maxSpawnY);
-            float randomZ = Random.Range(minSpawnZ,maxSpawnZ);
-            Vector3 birthPos = new Vector3(randomX,randomY,randomZ);
+            Vector3 birthPos = GetRandomStartPosition();
             Instantiate(powerPrefabs[randomSelection],birthPos,powerPrefabs[randomSelection].transform.rotation);
         }
     }
+
 }

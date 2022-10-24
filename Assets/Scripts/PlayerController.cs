@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
     public Slider strengthSlider;
     private GameObject sliderFill;
     private GameObject damageText;
-    //very important boolean
+    //very important boolean - for IPlayable
     private bool bIsPlaying = false;
     [SerializeField] private GameObject laser;
 
@@ -336,6 +336,8 @@ public class PlayerController : MonoBehaviour
     }
 
     //for other game objects to access but not effect
+    //implement as Properties now I've discovered that's how
+    //c# deals with encapsulation
     public float GetSpeed(){
         return speed;
     }
@@ -353,7 +355,5 @@ public class PlayerController : MonoBehaviour
         if(speed > maxSpeed) speed = maxSpeed;
         if(speed < minSpeed) speed = minSpeed;
         Debug.Log("Speed is: "+speed);
-        //deprecated as spawn is no longer based on time (InvokeRepeating)
-        //GameObject.Find("Spawn Manager").GetComponent<SpawnManager>().ReSpawn();
     }
 }
