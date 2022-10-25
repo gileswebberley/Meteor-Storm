@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+//This is the namespace I created for GameBounds singleton example
+using OodModels;
 
 /*
     perhaps x, y, and z bounds should be part of the GameManager with which
@@ -39,16 +41,16 @@ public class SpawnManager : SpawnerBase
     }
 
     void Awake(){
-        minSpawnX = -maxSpawnX;
-        minSpawnY = -maxSpawnY;
         Debug.Log("SpawnManager Awake()");
         //reference to player
         player = GameObject.Find("Player").GetComponent<PlayerController>();
         //This doesn't make sense - player should be getting these from here, perhaps via GameManager?
-        maxSpawnY = player.GetBounds().y;
+        maxSpawnY = GameBounds.maxX;//player.GetBounds().y;
         //Debug.Log("maxSpawnY: "+maxSpawnY);
-        maxSpawnX = player.GetBounds().x;
+        maxSpawnX = GameBounds.maxY;//player.GetBounds().x;
         //Debug.Log("maxSpawnX: "+maxSpawnX);
+        minSpawnX = -maxSpawnX;
+        minSpawnY = -maxSpawnY;
         //reference to game manager
         gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
     }
