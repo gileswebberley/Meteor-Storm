@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+//for GameBounds which must be set in GameManger
+using OodModels;
 
+[RequireComponent(typeof(Rigidbody))]
 public class MoveForward : MonoBehaviour
 {
     public float speed = 5f;
@@ -9,8 +12,7 @@ public class MoveForward : MonoBehaviour
     private float speedWithinEnvironment = 0f;
     //to discover the speed of the player 
     private PlayerController player;
-    //to discover the z bounds that is being spawned at so they die if they go further
-    private ISpawnable spawn;
+    //This is the declared required component
     private Rigidbody thisRB;
 
     // Start is called before the first frame update
@@ -18,7 +20,6 @@ public class MoveForward : MonoBehaviour
     {
         player = GameObject.Find("Player").GetComponent<PlayerController>();
         thisRB = GetComponent<Rigidbody>();
-        spawn = GameObject.Find("Spawn Manager").GetComponent<SpawnManager>();
         //if it's not a laser then randomise my speed a bit
         if(!gameObject.CompareTag("LaserShot")){
             speed = Random.Range(speed/speedRandomiserRange,speed*speedRandomiserRange);
@@ -30,11 +31,10 @@ public class MoveForward : MonoBehaviour
     {    
         speedWithinEnvironment = speed*player.GetSpeed();
         //This is how to get a continuous force that's just like the Translate behaviour
-        thisRB.AddForce(Vector3.forward*speedWithinEnvironment,ForceMode.Force);    
-        //transform.Translate(Vector3.forward*(speed*player.GetSpeed())*Time.deltaTime);
+        thisRB.AddForce(Vector3.forward*speedWithinEnvironment,ForceMode.Force);
 
         //check that we are still in view (within z-bounds)
-        if(transform.position.z > player.transform.position.z + 10 || transform.position.z < spawn.maxSpawnZ){
+        if(transform.position.z > GameBounds.minZ || transform.position.z < GameBounds.maxZ){
             Destroy(gameObject);
         }
     }

@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 //using System;
 using UnityEngine;
+using IModels;
 
-public class MeteorBehaviour : MonoBehaviour
+public class MeteorBehaviour : MonoBehaviour, ISpawnedEnemy
 {
     public float power = 2f;
     private float startPower;
@@ -17,14 +18,16 @@ public class MeteorBehaviour : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //just for testing
-        //Instantiate(explodePS,transform.position, transform.rotation);
         //for scoring
         startPower = power;
         player = GameObject.Find("Player").GetComponent<PlayerController>();
         gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
         //add a bit of random rotation on birth
-        GetComponent<Rigidbody>().AddTorque(Random.Range(-5,5),Random.Range(-5,5),Random.Range(-5,5));
+        GetComponent<Rigidbody>().AddTorque(Random.Range(-5,5),Random.Range(-5,5),Random.Range(-5,5),ForceMode.Force);
+    }
+
+    void RemoveFromSpawn(){
+        
     }
 
     void OnTriggerEnter(Collider other){

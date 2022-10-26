@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//This is the namespace I created for GameBounds singleton example
+
+//namespace for GameBounds singleton that is set in Gamemanager
 using OodModels;
+using IModels;
 
 /*
     perhaps x, y, and z bounds should be part of the GameManager with which
@@ -20,37 +22,40 @@ public class SpawnManager : SpawnerBase
 
     //everything wants links to Player and GameManager so perhaps this should be some kind of utility class of it's own 
     //should player be available through the GameManager rather than directly from all these classes?
-    private PlayerController player;
+    //Created a GameBounds singleton class with static properties
+
+    //gameHQ is only used to get the current difficulty
     private GameManager gameHQ;
     //No longer time based spawning but still here for now - maybe this should be a seperate TimeSpawnable interface?
     private float maxSpawnTime;
     private float spawnTime;
-    //This is also vital for Spawnable behaviour but 
-    //Interfaces are for "implementing peripheral abilities" - GeeksForGeeks
     
 
     //so we can move the z-index after first birth
+    //we divide the GameBounds.maxZ for the first spawn maxSpawnZ
     private float spawnZMoveMultiplier = 2f;
+    //we subtract this from GameBounds.minZ to move it in front of the player
+    private float spawnZMoveOffset = 100f;
     
 
     void Start()
     {
-        
+        /*
+        how do I check if the enemy implements the ISpawnedEnemy interface?
+        if(!meteorPrefabs[0].GetComponent<MeteorBehaviour>() is ISpawnedEnemy){
+            Debug.LogError("ENEMY PREFAB IS NOT ISpawnedEnemy");
+        }
+        */
 
         //RestartSpawn();
     }
 
     void Awake(){
         Debug.Log("SpawnManager Awake()");
-        //reference to player
-        player = GameObject.Find("Player").GetComponent<PlayerController>();
-        //This doesn't make sense - player should be getting these from here, perhaps via GameManager?
-        maxSpawnY = GameBounds.maxX;//player.GetBounds().y;
-        //Debug.Log("maxSpawnY: "+maxSpawnY);
-        maxSpawnX = GameBounds.maxY;//player.GetBounds().x;
-        //Debug.Log("maxSpawnX: "+maxSpawnX);
-        minSpawnX = -maxSpawnX;
-        minSpawnY = -maxSpawnY;
+        maxSpawnX = GameBounds.maxX;
+        maxSpawnY = GameBounds.maxY;
+        minSpawnX = GameBounds.minX;
+        minSpawnY = GameBounds.minY;
         //reference to game manager
         gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
     }
@@ -61,7 +66,7 @@ public class SpawnManager : SpawnerBase
         if(!bIsSpawning) return;
         //If there are too few meteors then spawn another wave of everything
         //++ needs improving - now better with more speed variation in MoveForward
-        if(FindObjectsOfType<MeteorBehaviour>().Length < minSpawnAmount * gameHQ.GetDifficulty()){
+        if(FindObjectsOfType<MeteorBehaviour>().Length < minSpawnAmount * DifficultyManager.difficulty){
             SpawnAll();
             Debug.Log("SpawnAll() called from Update()");
         }
@@ -69,17 +74,17 @@ public class SpawnManager : SpawnerBase
 
     //Abstraction of the resetting of fields to a start state
     private void ResetSpawnZ(){
-        Debug.Log("ResetSpawn() called");
-        maxSpawnZ /= spawnZMoveMultiplier;
-        minSpawnZ -= maxSpawnZ;
+        Debug.Log("ResetSpawnZ() called");
+        maxSpawnZ = GameBounds.maxZ/spawnZMoveMultiplier;
+        minSpawnZ = GameBounds.minZ - spawnZMoveOffset;
     }
 
     public override void StartSpawn(){
         SpawnAll();
         Debug.Log("SpawnAll() called from StartSpawn() ");
         //... then move the z spawn backwards as in Start()
-        minSpawnZ += maxSpawnZ;
-        maxSpawnZ *= spawnZMoveMultiplier;
+        minSpawnZ = maxSpawnZ;
+        maxSpawnZ = GameBounds.maxZ;
         bIsSpawning = true;
         bHasStarted = true;
     }
@@ -99,7 +104,7 @@ public class SpawnManager : SpawnerBase
     }
     //Abstraction that every Spawnable must implement - this should be split into SpawnEnemies and SpawnBonuses
     public override void SpawnAll(){
-        int diff = gameHQ.GetDifficulty();
+        int diff = DifficultyManager.difficulty;
         //make it based on a difficulty, so as it gets more difficult you get more meteors and less power ups
         SpawnMeteors(minSpawnAmount*diff,maxSpawnAmount*diff);
         //we want this to be controllable so less as it gets harder

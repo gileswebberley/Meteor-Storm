@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+//for the GameBounds singleton
+using OodModels;
 
 public class PlayerController : MonoBehaviour
 {
@@ -24,17 +26,20 @@ public class PlayerController : MonoBehaviour
     private bool bTargetV = false;
     //to convert the mouse position into an "identity matrix"? (is that where the value is between -1.0 and 1.0?) store the screen width and height
     private Vector3 screenModifier;
-    //maximum devation across
-    private float xBounds = 50f;
-    //maximum deviation up and down
-    private float yBounds = 50f;
+
+    //deprecated for GameBounds use instead
+    // //maximum devation across
+    private float xBounds;
+    // //maximum deviation up and down
+    private float yBounds;
+
     //all the speed based properties -------
     //affects control twitchyness, other objects use it to make it feel like speed has changed
     private float speed = 10f;
     private float minSpeed = 5f;
     private float maxSpeed = 20f;
     //the amount of torque added by imaginary booster rockets (help get control back when spinning)using System.Collections;
-    private float rotationalBoosters = 0.75f;
+    private float rotationalBoosters = 0.5f;
     //The number by which targetVector.x is divided within AddTorque()
     private float rotationalDamper = 30f;
     //now using to reset player on restart
@@ -275,21 +280,21 @@ public class PlayerController : MonoBehaviour
     Vector3 CheckForBounds(){
         Vector3 temp = new Vector3(1,1,1);
         //gone too wide so push us back into the middle and return [0,y,1] 
-        if(transform.position.x + targetVector.x > xBounds){
+        if(transform.position.x + targetVector.x > GameBounds.maxX){
             temp.x = 0;
             MoveMe(Vector3.left);
             //playerRB.AddForce(Vector3.left*speed,ForceMode.Impulse);
-        }else if(transform.position.x + targetVector.x < -xBounds){            
+        }else if(transform.position.x + targetVector.x < GameBounds.minX){            
             temp.x = 0;
             MoveMe(Vector3.right);
             //playerRB.AddForce(Vector3.right*speed,ForceMode.Impulse);
         }
         //gone too high or low so push us back into the middle and return[x,0,1]
-        if(transform.position.y + targetVector.y > yBounds){
+        if(transform.position.y + targetVector.y > GameBounds.maxY){
             temp.y = 0;
             MoveMe(Vector3.down);
             //playerRB.AddForce(Vector3.down,ForceMode.Impulse);
-        }else if(transform.position.y + targetVector.y < -yBounds){            
+        }else if(transform.position.y + targetVector.y < GameBounds.minY){            
             temp.y = 0;
             MoveMe(Vector3.up);
             //playerRB.AddForce(Vector3.up,ForceMode.Impulse);
@@ -344,10 +349,6 @@ public class PlayerController : MonoBehaviour
 
     public float GetMaxSpeed(){
         return maxSpeed;
-    }
-
-    public Vector3 GetBounds(){
-        return new Vector3(xBounds,yBounds,transform.position.z);
     }
 
     void ChangeSpeed(float n){
