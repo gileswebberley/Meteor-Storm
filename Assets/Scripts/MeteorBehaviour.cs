@@ -25,9 +25,9 @@ public class MeteorBehaviour : MonoBehaviour, ISpawnedEnemy
         //add a bit of random rotation on birth
         GetComponent<Rigidbody>().AddTorque(Random.Range(-5,5),Random.Range(-5,5),Random.Range(-5,5),ForceMode.Force);
     }
+    //this is not right is it, I want to make sure that spawn manager keeps track of our death 
+    public void RemoveFromSpawn(){
 
-    void RemoveFromSpawn(){
-        
     }
 
     void OnTriggerEnter(Collider other){
