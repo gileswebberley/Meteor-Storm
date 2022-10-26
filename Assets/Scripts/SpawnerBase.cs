@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using UnityEngine;
+using IModels;
 
 /*
 This is the abstract base class that implements the ISpawnable interface and brings
@@ -34,28 +35,22 @@ public abstract class SpawnerBase : MonoBehaviour, ISpawnable {
     protected float _minSpawnZ = -100f;
     public float minSpawnZ {
         get {return _minSpawnZ;} 
-        protected set {
-                    if(value <= 0){ 
-                        //make sure it's a negative value - not sure about this
-                        _minSpawnZ = value;
-                    }else{
-                        //assume user forgot the minus sign
-                        _minSpawnZ = value * -1;
-                    }
-                }
+        protected set { _minSpawnZ = value;}
     }
     protected float _maxSpawnZ = -400f;
     public float maxSpawnZ {
         get {return _maxSpawnZ;} 
+        protected set { _maxSpawnZ = value;}
+    }
+
+    private int _currentSpawnedEnemies = 0;
+    public int currentSpawnedEnemies{
+        //how do I make this thread safe with a lock?
+        get{return _currentSpawnedEnemies;}
         protected set {
-                    if(value <= 0){ 
-                        //make sure it's a negative value
-                        _maxSpawnZ = value;
-                    }else{
-                        //assume user forgot the minus sign
-                        _maxSpawnZ = value * -1;
-                    }
-                }
+            //does this allow for pre and or post incrementing? seems so :)
+            _currentSpawnedEnemies = value;
+        }
     }
     //abstract classes that must be overriden and implemented in the child class
     public abstract void StartSpawn();
