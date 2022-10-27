@@ -42,16 +42,20 @@ namespace OodModels
         {
             if(_mono != null){
                 //in case it's already been started from elsewhere
-                _mono.StopCoroutine("DifficultyChangeTimer");
+                _mono.StopCoroutine(DifficultyChangeTimer());
                 difficultyChangeTime = stepSeconds;
-                _mono.StartCoroutine("DifficultyChangeTimer");
+                _mono.StartCoroutine(DifficultyChangeTimer());
+            }else{
+                Debug.LogError("DifficultyManager._mono is null");
             }
         }
 
         public void StopDifficultyStepTimer()
         {
             if(_mono != null){
-            _mono.StopCoroutine("DifficultyChangeTimer");
+            _mono.StopCoroutine(DifficultyChangeTimer());
+            }else{
+                Debug.LogError("DifficultyManager._mono is null");
             }
         }
 
@@ -63,7 +67,7 @@ namespace OodModels
             if (IncrementDifficulty())
             {
                 //if not topped out resursively call this iterator
-                _mono.StartCoroutine("DifficultyChangeTimer");
+                _mono.StartCoroutine(DifficultyChangeTimer());
             }
         }
 
