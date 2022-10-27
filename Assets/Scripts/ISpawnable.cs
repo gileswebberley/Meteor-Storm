@@ -24,7 +24,7 @@ namespace IModels
         public bool bHasStarted { get; }
         int minSpawnAmount { get; }
         int maxSpawnAmount { get; }
-        int currentSpawnedEnemies {get;}
+        int currentSpawnedEnemies {get; set;}
         float minSpawnX { get; }
         float maxSpawnX { get; }
         float minSpawnY { get; }
@@ -41,6 +41,11 @@ namespace IModels
     //as a way to track numbers without using FindObjectsOfType<MeteorBehaviour>
     public interface ISpawnedEnemy
     {
+        //must have a reference to the spawn manager that will keep the count
+        ISpawnable spawn {get;}
+        //destroy game object when removed from spawn count
         abstract void RemoveFromSpawn();
+        //create your reference to the ISpawnable in here
+        abstract void AddToSpawn();
     }
 }

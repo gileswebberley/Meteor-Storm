@@ -47,8 +47,9 @@ public abstract class SpawnerBase : MonoBehaviour, ISpawnable {
     public int currentSpawnedEnemies{
         //how do I make this thread safe with a lock?
         get{return _currentSpawnedEnemies;}
-        protected set {
-            //does this allow for pre and or post incrementing? seems so :)
+        set {
+            Debug.Log("currentSpawnedEnemies: "+_currentSpawnedEnemies);
+            //does this allow for pre and or post incrementing? seems so :)if(value > 0) 
             _currentSpawnedEnemies = value;
         }
     }

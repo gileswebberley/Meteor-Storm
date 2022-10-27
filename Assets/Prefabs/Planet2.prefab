@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 3122467906245281056}
   - component: {fileID: 3122467906245281059}
   - component: {fileID: 3122467906245281063}
-  - component: {fileID: 3122467906245281060}
   - component: {fileID: 759390426509800999}
   m_Layer: 0
   m_Name: Planet2
@@ -116,19 +115,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &3122467906245281060
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3122467906245281058}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29e546ea1d2bcf33285a13a77880d6c6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 40
 --- !u!114 &759390426509800999
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -141,6 +127,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc7b45de66aa54f718c3c0114d986cad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 40
   power: 10
   explodePS: {fileID: 772252025218655831, guid: 6e4ce083577241d78b8cbbf3ce88dafa,
     type: 3}

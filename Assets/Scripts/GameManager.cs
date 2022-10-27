@@ -41,10 +41,12 @@ public class GameManager : MonoBehaviour {
         GameBounds.minBounds = new Vector3(-50,-50,10);
         //maxBounds.z is the "farthest away" z-value
         GameBounds.maxBounds = new Vector3(50,50,-800);
-        
-        //Can't find Difficulty Manager??
+
+        //Can't find Difficulty Manager?? can't use new with MonoBehaviour
         DifficultyManager.maxDifficulty = 5;
         DifficultyManager.difficulty = 1;
+        //Try to set this calling MonoBehaviour object to run co-routines
+        DifficultyManager.mono = this;
 
         //get references to necessary components
         //in oop terms is this a form of Aggregation? 

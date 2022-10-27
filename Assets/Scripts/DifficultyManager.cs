@@ -5,14 +5,20 @@ using UnityEngine;
 namespace OodModels
 {
     //break out functionality from GameManager, MonoBehaviour is for Start/StopCoroutine()
-    public class DifficultyManager : MonoBehaviour
+    public class DifficultyManager
     {
-        //Create the private singleton instance
+        //Create the private singleton instance - can't with MOnoBehaviour :(
         private static readonly DifficultyManager _instance = new DifficultyManager();
-        //Private constructor
+        // //Private constructor
         private DifficultyManager() { }
-        //Property to encapsulate the _instance
-        //only needed to access non-static members
+        //introducing a monobehaviour object reference to run coroutines - give this a go
+        private static MonoBehaviour _mono = null;
+        public static MonoBehaviour mono {
+            protected get {return _mono;}
+            set {_mono = value;}
+        }
+        // //Property to encapsulate the _instance
+        // //only needed to access non-static members
         public static DifficultyManager Instance
         {
             get { return _instance; }
@@ -34,25 +40,30 @@ namespace OodModels
 
         public void StartDifficultyStepTimer(float stepSeconds)
         {
-            //in case it's already been started from elsewhere
-            StopCoroutine("DifficultyChangeTimer");
-            difficultyChangeTime = stepSeconds;
-            StartCoroutine("DifficultyChangeTimer");
+            if(_mono != null){
+                //in case it's already been started from elsewhere
+                _mono.StopCoroutine("DifficultyChangeTimer");
+                difficultyChangeTime = stepSeconds;
+                _mono.StartCoroutine("DifficultyChangeTimer");
+            }
         }
 
         public void StopDifficultyStepTimer()
         {
-            StopCoroutine("DifficultyChangeTimer");
+            if(_mono != null){
+            _mono.StopCoroutine("DifficultyChangeTimer");
+            }
         }
 
         IEnumerator DifficultyChangeTimer()
         {
+            Debug.Log("DifficultyChangeTimer");
             yield return new WaitForSeconds(difficultyChangeTime);
             //then add 1 to difficulty
             if (IncrementDifficulty())
             {
                 //if not topped out resursively call this iterator
-                StartCoroutine("DifficultyChangeTimer");
+                _mono.StartCoroutine("DifficultyChangeTimer");
             }
         }
 
@@ -97,6 +108,7 @@ namespace OodModels
             else
             {
                 _difficulty++;
+                Debug.Log("Increment : difiiculty is now: "+_difficulty);
                 return true;
             }
         }

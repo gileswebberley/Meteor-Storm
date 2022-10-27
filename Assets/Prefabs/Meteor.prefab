@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 5885495742218963571}
   - component: {fileID: 5885495742218963572}
   - component: {fileID: 5885495742218963573}
-  - component: {fileID: 5885495742218963569}
   - component: {fileID: 5885495742218963568}
   - component: {fileID: 440228621864519914}
   m_Layer: 0
@@ -100,19 +99,6 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &5885495742218963569
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5885495742218963574}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29e546ea1d2bcf33285a13a77880d6c6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 10
 --- !u!54 &5885495742218963568
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -141,6 +127,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc7b45de66aa54f718c3c0114d986cad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 10
   power: 2
   explodePS: {fileID: 772252025218655831, guid: 6e4ce083577241d78b8cbbf3ce88dafa,
     type: 3}
