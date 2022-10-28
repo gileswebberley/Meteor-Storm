@@ -11,7 +11,7 @@ namespace OodModels
         private static readonly DifficultyManager _instance = new DifficultyManager();
         // //Private constructor
         private DifficultyManager() { }
-        //introducing a monobehaviour object reference to run coroutines - give this a go
+        //introducing a monobehaviour object reference to run coroutines
         private static MonoBehaviour _mono = null;
         public static MonoBehaviour mono {
             protected get {return _mono;}
