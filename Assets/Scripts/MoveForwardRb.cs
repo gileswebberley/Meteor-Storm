@@ -7,12 +7,11 @@ using OodModels;
 //using this directive makes Unity Editor add the component to the game object
 //it's attached to if missing
 [RequireComponent(typeof(Rigidbody))]
-public class MoveForward : MonoBehaviour
+public class MoveForwardRb : MonoBehaviour
 {
     public float speed = 5f;
-    //private field with access for Unity Editor Inspector
-    [SerializeField] private float speedRandomiserRange = 7f;
-    private float speedWithinEnvironment = 0f;
+    
+    protected float speedWithinEnvironment = 0f;
     //to discover the speed of the player 
     protected PlayerController player;
     //This is the declared required component
@@ -23,15 +22,12 @@ public class MoveForward : MonoBehaviour
     {
         player = GameObject.Find("Player").GetComponent<PlayerController>();
         thisRB = GetComponent<Rigidbody>();
-        //if it's not a laser then randomise my speed a bit
-        if(!gameObject.CompareTag("LaserShot")){
-            speed = Random.Range(speed/speedRandomiserRange,speed*speedRandomiserRange);
-        }
     }
 
     // Update is called once per frame
     protected virtual void Update()
-    {    
+    {  
+        //check for bounds and kill if false  
         if(!RbAddForwardForce()){
             Destroy(gameObject);
         }
@@ -46,8 +42,8 @@ public class MoveForward : MonoBehaviour
         //check that we are still in view (within z-bounds)
         if(transform.position.z > GameBounds.minZ || transform.position.z < GameBounds.maxZ){
             return false;
-            //Destroy(gameObject);
         }
+        //we are within bounds and have moved forwards
         return true;
     }
 }

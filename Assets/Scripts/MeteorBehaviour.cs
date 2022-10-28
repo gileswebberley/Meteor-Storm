@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using IModels;
 
-public class MeteorBehaviour : MoveForward, ISpawnedEnemy//MonoBehaviour, ISpawnedEnemy
+public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy//MonoBehaviour, ISpawnedEnemy
 {
     public float power = 2f;
     private float startPower;

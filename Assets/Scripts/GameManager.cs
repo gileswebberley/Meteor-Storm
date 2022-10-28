@@ -71,7 +71,6 @@ public class GameManager : MonoBehaviour {
         gameOverUI.SetActive(true);
         spawn.StopSpawning();
         player.DisablePlayer();
-        DifficultyManager.difficulty = 1;// SetDifficulty(1);
         DifficultyManager.Instance.StopDifficultyStepTimer();
         //StopCoroutine("DifficultyChangeTimer");
     }
@@ -80,6 +79,7 @@ public class GameManager : MonoBehaviour {
         gameOver = false;
         gameOverUI.SetActive(false);
         scoreText.gameObject.SetActive(true);
+        DifficultyManager.Instance.SetDifficulty(1);
         //make an auto difficulty change happen every difficultyChangeTime(seconds)
         DifficultyManager.Instance.StartDifficultyStepTimer(difficultyChangeTime);
         // ++ use Awake()

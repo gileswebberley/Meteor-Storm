@@ -7,7 +7,7 @@ namespace OodModels
     //break out functionality from GameManager, MonoBehaviour is for Start/StopCoroutine()
     public class DifficultyManager
     {
-        //Create the private singleton instance - can't with MOnoBehaviour :(
+        //Create the private singleton instance - can't new MonoBehaviour() hence the _mono solution
         private static readonly DifficultyManager _instance = new DifficultyManager();
         // //Private constructor
         private DifficultyManager() { }
@@ -61,11 +61,13 @@ namespace OodModels
 
         IEnumerator DifficultyChangeTimer()
         {
-            Debug.Log("DifficultyChangeTimer");
+            Debug.Log("DifficultyChangeTimer waiting....");
             yield return new WaitForSeconds(difficultyChangeTime);
+            Debug.Log("DifficultyChangeTimer finished waiting");
             //then add 1 to difficulty
             if (IncrementDifficulty())
             {
+                Debug.Log("DifficultyChangeTimer incrementing");
                 //if not topped out resursively call this iterator
                 _mono.StartCoroutine(DifficultyChangeTimer());
             }
@@ -73,6 +75,7 @@ namespace OodModels
 
         public void SetDifficulty(int d)
         {
+            Debug.Log($"SetDifficulty({d})");
             if (d > _maxDifficulty)
             {
                 _difficulty = _maxDifficulty;
@@ -92,6 +95,7 @@ namespace OodModels
 
         public void SetMaxDifficulty(int d)
         {
+            Debug.Log($"SetMaxDifficulty({d})");
             if (d < 1)
             {
                 _maxDifficulty = 1;
@@ -112,7 +116,7 @@ namespace OodModels
             else
             {
                 _difficulty++;
-                Debug.Log("Increment : difiiculty is now: "+_difficulty);
+                Debug.Log($"Increment : difiiculty is now: {_difficulty}");
                 return true;
             }
         }
@@ -128,6 +132,7 @@ namespace OodModels
             {
                 //if safe change the value
                 _difficulty--;
+                Debug.Log($"Decrement : difiiculty is now: {_difficulty}");
                 return true;
             }
         }

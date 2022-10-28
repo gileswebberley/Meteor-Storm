@@ -246,7 +246,8 @@ public class PlayerController : MonoBehaviour
     //when it get's to zero it's GAME OVER
     void AddDamageLevel(GameObject otherGO){
         //How big was the hit? Basic sum based on mass and speed
-        float damage = speed + otherGO.GetComponent<MoveForward>().speed + otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
+        //using polymorphism with MoveForwardRb which is the base moving class
+        float damage = speed + otherGO.GetComponent<MoveForwardRb>().speed + otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
         strength -= damage;
         Debug.Log("DAMAGE: Strength is now: "+strength);
 
