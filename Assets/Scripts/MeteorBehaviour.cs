@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using IModels;
 
-public class MeteorBehaviour : MoveForward, ISpawnedEnemy//MonoBehaviour, ISpawnedEnemy
+public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy//MonoBehaviour, ISpawnedEnemy
 {
     public float power = 2f;
     private float startPower;
@@ -50,6 +50,11 @@ public class MeteorBehaviour : MoveForward, ISpawnedEnemy//MonoBehaviour, ISpawn
 
     //this is not right is it, I want to make sure that spawn manager keeps track of our death 
     public void RemoveFromSpawn(){
+        //if we haven't been added we won't have a reference to spawn, as it should be I think
+        if(spawn == null){
+            Debug.LogError("RemoveFromSpawn called without ISpawnable reference");
+            return;
+        }
         --spawn.currentSpawnedEnemies;
         //we've removed ourselves so we must be dead, let's ensure that
         Destroy(gameObject);
@@ -58,6 +63,10 @@ public class MeteorBehaviour : MoveForward, ISpawnedEnemy//MonoBehaviour, ISpawn
     public void AddToSpawn(){
         //set up our reference to an ISpawnable (which has a currentSpawnedEnemies property)
         spawn = GameObject.Find("Spawn Manager").GetComponent<SpawnManager>();
+        if(spawn == null){
+            Debug.LogError("MeteorBehaviour.AddToSpawn cannot find an ISpawnable reference");
+            return;
+        }
         //add ourselves to the spawn manager's internal count
         ++spawn.currentSpawnedEnemies;
     }
