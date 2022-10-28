@@ -9,19 +9,20 @@ namespace OodModels
     {
         //Create the private singleton instance - can't new MonoBehaviour() hence the _mono solution
         private static readonly DifficultyManager _instance = new DifficultyManager();
-        // //Private constructor
-        private DifficultyManager() { }
-        //introducing a monobehaviour object reference to run coroutines
-        private static MonoBehaviour _mono = null;
-        public static MonoBehaviour mono {
-            protected get {return _mono;}
-            set {_mono = value;}
-        }
         // //Property to encapsulate the _instance
         // //only needed to access non-static members
         public static DifficultyManager Instance
         {
             get { return _instance; }
+        }
+        // //Private constructor
+        private DifficultyManager() { }
+        
+        //introducing a monobehaviour object reference to run coroutines
+        private static MonoBehaviour _mono = null;
+        public static MonoBehaviour mono {
+            protected get {return _mono;}
+            set {_mono = value;}
         }
         private static int _maxDifficulty = 5;
         public static int maxDifficulty

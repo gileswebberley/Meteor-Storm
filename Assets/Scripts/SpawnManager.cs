@@ -65,7 +65,7 @@ public class SpawnManager : SpawnerBase
     {
         if(!bIsSpawning) return;
         //If there are too few meteors then spawn another wave of everything
-        //++ needs improving - now better with more speed variation in MoveForward
+        //More efficient way than using FindObjectsOfType every time
         if(currentSpawnedEnemies < minSpawnAmount * DifficultyManager.difficulty){
             SpawnAll();
             Debug.Log("SpawnAll() called from Update()");

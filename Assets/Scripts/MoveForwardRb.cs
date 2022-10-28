@@ -21,6 +21,7 @@ public class MoveForwardRb : MonoBehaviour
     protected virtual void Start()
     {
         player = GameObject.Find("Player").GetComponent<PlayerController>();
+        Debug.LogError("MoveForwardRb cannot find Player component PlayerController");
         thisRB = GetComponent<Rigidbody>();
     }
 

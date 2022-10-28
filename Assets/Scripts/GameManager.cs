@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour {
      //Game Over page with restart button
      private GameObject gameOverUI;
      private int score = 0;
+     private ScoreManager scorer;
 
     void Start(){
         UpdateScore(0);
@@ -48,6 +49,9 @@ public class GameManager : MonoBehaviour {
         //Try to set this calling MonoBehaviour object to run co-routines
         DifficultyManager.mono = this;
 
+        //Try using score manager....
+        scorer = new ScoreManager();
+
         //get references to necessary components
         //in oop terms is this a form of Aggregation? 
         gameOverUI = transform.Find("Game Over Page").gameObject;
@@ -59,10 +63,11 @@ public class GameManager : MonoBehaviour {
     }
 
     public void UpdateScore(int toAdd){
-        score += toAdd;
+        scorer.AddToScore(toAdd);
+        //score += toAdd;
         //using c# "string interpolation" by using the $ before the string values can be 
         //put directly into the string without concatenation by placing them in {}
-        scoreText.text = $"score:{score}";//+score;
+        scoreText.text = $"score:{scorer.score}";//+score;
     }
 
     public void GameOver(){
@@ -89,7 +94,7 @@ public class GameManager : MonoBehaviour {
 
     public void RestartGame(){//function attached to the restart button
         //We don't need to set this in StartGame() as it is initialised with a value of 1
-        UpdateScore(-score);
+        UpdateScore(-scorer.score);
         StartGame();
     }
 }
