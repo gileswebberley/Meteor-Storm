@@ -20,7 +20,9 @@ public class GameManager : MonoBehaviour {
     //This is why we've added the TMPro library
     [SerializeField] private TextMeshProUGUI scoreText;
 
-     //reference to Spawn Manager via ISpawnable interface - abstraction and encapsulation I think?
+    //A Game USES-A (Aggregation?) spawn, score, difficulty (and leaderboard)
+    //but must surely HAVE_A (Composition?) player?
+     //reference to Spawn Manager via ISpawnable interface - abstraction (and encapsulation) I think?
      private ISpawnable spawn;
      //reference to the Player
      private PlayerController player;
@@ -43,7 +45,7 @@ public class GameManager : MonoBehaviour {
         //maxBounds.z is the "farthest away" z-value
         GameBounds.maxBounds = new Vector3(50,50,-800);
 
-        //Can't find Difficulty Manager?? can't use new with MonoBehaviour
+        //Set up the static properties for difficulty
         DifficultyManager.maxDifficulty = 5;
         DifficultyManager.difficulty = 1;
         //Try to set this calling MonoBehaviour object to run co-routines
@@ -67,7 +69,7 @@ public class GameManager : MonoBehaviour {
         //score += toAdd;
         //using c# "string interpolation" by using the $ before the string values can be 
         //put directly into the string without concatenation by placing them in {}
-        scoreText.text = $"score:{scorer.score}";//+score;
+        scoreText.text = $"{scorer.name} score:{scorer.score}";//+score;
     }
 
     public void GameOver(){

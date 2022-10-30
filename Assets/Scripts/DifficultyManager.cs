@@ -5,6 +5,7 @@ using UnityEngine;
 namespace OodModels
 {
     //break out functionality from GameManager, MonoBehaviour is for Start/StopCoroutine()
+    //only want one per game I think, perhaps call it StaticDifficultyManager? 
     public class DifficultyManager
     {
         //Create the private singleton instance - can't new MonoBehaviour() hence the _mono solution
@@ -17,7 +18,7 @@ namespace OodModels
         }
         // //Private constructor
         private DifficultyManager() { }
-        
+
         //introducing a monobehaviour object reference to run coroutines
         private static MonoBehaviour _mono = null;
         public static MonoBehaviour mono {
@@ -69,7 +70,7 @@ namespace OodModels
             if (IncrementDifficulty())
             {
                 Debug.Log("DifficultyChangeTimer incrementing");
-                //if not topped out resursively call this iterator
+                //if not topped out, resursively call this iterator
                 _mono.StartCoroutine(DifficultyChangeTimer());
             }
         }
@@ -80,12 +81,10 @@ namespace OodModels
             if (d > _maxDifficulty)
             {
                 _difficulty = _maxDifficulty;
-                return;
             }
             else if (d < 1)
             {
                 _difficulty = 1;
-                return;
             }
             else
             {
@@ -100,7 +99,6 @@ namespace OodModels
             if (d < 1)
             {
                 _maxDifficulty = 1;
-                return;
             }
             else
             {
