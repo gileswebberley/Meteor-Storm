@@ -23,7 +23,7 @@ namespace OodModels
             set {
                 _leaderboardCapacity = value;
                 leaderboardArray.Capacity = _leaderboardCapacity;
-                }//this could be dangerous?
+                }//this could be dangerous if threaded?
         }
         //private because changing has an effect on the internal List
         private int _leaderboardSize = 10;
@@ -53,9 +53,10 @@ namespace OodModels
         //the derived class method of saving using name
         public abstract void SaveLeaderboard(string name);
         //the derived class method of loading using _leaderboardName
-        public abstract void LoadLeaderboard();
+        //return success
+        public abstract bool LoadLeaderboard();
         //the derived class method of saving using _leaderboardName
-        public abstract void SaveLeaderboard();
+        public abstract bool SaveLeaderboard();
 
         //Provided in here as it is only dealing with the underlying data
         protected void AddToLeaderboardRaw(ScoreData newScore)
@@ -64,8 +65,10 @@ namespace OodModels
             {
                 //--------- extract out
                 leaderboardArray.Add(newScore);
-                //then sort based on the ScoreData Comparable I hope
+                //then sort based on the ScoreData Comparable I hope - doesn't seem to be working
                 leaderboardArray.Sort();
+
+                Debug.Log($"New score (rank): {newScore.name} : {newScore.score} ({leaderboardArray.IndexOf(newScore)+1}) added to the {_leaderboardName} leaderboard");
                 //if we're about to resize the list clip off the last entry to enforce capacity
                 if (leaderboardArray.Count >= leaderboardArray.Capacity - 1)
                 {
@@ -78,8 +81,8 @@ namespace OodModels
             }
         }
 
-        public virtual List<ScoreData> GetLeaderboardRaw(){
-            List<ScoreData> temp = new List<ScoreData>(_leaderboardSize);
+        protected virtual List<ScoreData> GetLeaderboardRaw(){
+            List<ScoreData> temp = new List<ScoreData>(_leaderboardSize);//use GetRange(0,_leaderboardSize)?
             for(int i = 0; i < _leaderboardSize; i++){
                 temp.Add(leaderboardArray[i]);
             }
@@ -119,7 +122,7 @@ namespace OodModels
         {
             LoadLeaderboard(_leaderboardName);
             //dealing with the underlying List<ScoreData> so use inherited method
-            AddToLeaderboardRaw(newScore);
+            AddToLeaderboardRaw(newScore);//should this be base.AddToLeaderboard(ScoreData)?
             SaveLeaderboard(_leaderboardName);
         }
 
@@ -130,29 +133,20 @@ namespace OodModels
             //so I won't set in the save version (like a Save and Save As... options with a document)
             //set the internal file name for AddToLeaderboard() auto load/save
             _leaderboardName = name;
-            if (File.Exists(Application.persistentDataPath + "/" + name + ".json"))
+            if (!LoadLeaderboard())
             {
-                string jsonStr = File.ReadAllText(Application.persistentDataPath + "/" + name + ".json");
-                leaderboardArray = JsonUtility.FromJson<List<ScoreData>>(jsonStr);
-            }
-            else
-            {
-                //set up a default leaderboardArray of leaderboardSize length
-                int i = 0;
-                do
-                {
-                    leaderboardArray.Add(new ScoreData());//fill with ScoreData default constructor
-                    ++i;
-                } while (i < leaderboardSize);
+                //then save it, as if it's been requested and doesn't exist it probably should now?
+                SaveLeaderboard();
             }
         }
 
         //will load leaderboard set via leaderboardName property directly from the user object
-        public override void LoadLeaderboard(){
+        public override bool LoadLeaderboard(){
             if (File.Exists(Application.persistentDataPath + "/" + _leaderboardName + ".json"))
             {
                 string jsonStr = File.ReadAllText(Application.persistentDataPath + "/" + _leaderboardName + ".json");
                 leaderboardArray = JsonUtility.FromJson<List<ScoreData>>(jsonStr);
+                return true;
             }
             else
             {
@@ -163,6 +157,7 @@ namespace OodModels
                     leaderboardArray.Add(new ScoreData());//fill with ScoreData default constructor
                     ++i;
                 } while (i < leaderboardSize);
+                return false;
             }
         }
 
@@ -175,10 +170,11 @@ namespace OodModels
         }
 
         //and the save the last loaded leaderboard
-        public override void SaveLeaderboard()
+        public override bool SaveLeaderboard()
         {
             string jsonStr = JsonUtility.ToJson(leaderboardArray);
             File.WriteAllText(Application.persistentDataPath + "/" + _leaderboardName + ".json", jsonStr);
+            return true;
         }
     }
 }

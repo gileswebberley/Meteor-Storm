@@ -46,7 +46,8 @@ public class PlayerController : MonoBehaviour
     private float originalAngularDrag;
 
     private float power = 0f;
-    private float maxPower = 20f;
+    [SerializeField] private float startPower = 10f;
+    [SerializeField] private float maxPower = 20f;
     private float indicatorMoveStep;
     private GameObject powerIndicator;
     //how much power so the victims can check how much to remove from themselves
@@ -58,8 +59,9 @@ public class PlayerController : MonoBehaviour
     private bool bIsFiring = false;
     private float roundsPerSecond = 10f;
     //Implement damage
-    private float strength;
-    private float maxStrength;
+    private float strength = 500f;
+    [SerializeField] private float startStrength = 500f;
+    [SerializeField] private float maxStrength = 1000f;
 
     //trying to get the position to reset on Restart()
     private Quaternion originalRotation;
@@ -148,17 +150,23 @@ public class PlayerController : MonoBehaviour
         playerRB.MoveRotation(originalRotation);
         playerRB.angularDrag = originalAngularDrag;
         //set the slider parameters to match the strength
-        maxStrength = aStrength;
+        //maxStrength = aStrength;
         strengthSlider.maxValue = maxStrength;
         //a test whether I've grabbed the correct game object
         //yep, so it can hide the text and the indicator
         damageText.SetActive(true);
         strength = 0;
+        //use this so it looks after the UI component
         AddStrengthLevel(aStrength);
         speed = minSpeed;
         AddPowerLevel(-power);
         AddPowerLevel(aPower);
         bIsPlaying = true;
+    }
+
+    public void EnablePlayer()
+    {
+        EnablePlayer(startStrength,startPower);
     }
 
     // Behaviour when hit by collider with isTrigger = true
@@ -172,7 +180,7 @@ public class PlayerController : MonoBehaviour
         }
         else if(other.CompareTag("StrengthUp")){
             //add a bit of strenth
-            AddStrengthLevel(gameHQ.playerStrength/10f);
+            AddStrengthLevel(maxStrength/10f);
             Destroy(other.gameObject);
         }else if(other.CompareTag("Star")){
             //death by a star, damage is based on mass in rigidbody

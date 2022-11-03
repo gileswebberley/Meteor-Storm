@@ -423,8 +423,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5edacd2cf07194e369faafa0dfe8943e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPower: 5
-  playerStrength: 1000
   difficultyChangeTime: 60
   scoreText: {fileID: 931454688}
 --- !u!1 &410087039
@@ -956,6 +954,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   strengthSlider: {fileID: 1623015967}
   laser: {fileID: 2662479520080950041, guid: b2fcfb1c07428f058a24901fe54e1f04, type: 3}
+  startPower: 10
+  maxPower: 20
+  startStrength: 200
+  maxStrength: 1000
 --- !u!65 &858532422
 BoxCollider:
   m_ObjectHideFlags: 0

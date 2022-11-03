@@ -27,6 +27,8 @@ namespace OodModels
         //trying to implement sorting based on score but not sure how to
         public int CompareTo(ScoreData y)
         {
+            if(y == null)return 1;
+            //else
             return this.score - y.score;
         }
     }

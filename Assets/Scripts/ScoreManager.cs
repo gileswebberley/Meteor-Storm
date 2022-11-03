@@ -4,6 +4,10 @@ namespace OodModels
 {
     public class ScoreManager
     {
+        //I was about to make this a singleton but there's some doubt about whether that's appropriate
+        //if I did then I wouldn't be able to use several instances in a, let's call it, MultiScoreManager
+        //this could then implement a collection of ScoreManagers each with their own score? But I want to
+        //reference this from several other objects which is why it seems tempting :/
         protected ScoreData _thisScore = new ScoreData();
         public ScoreData data {
             get {return _thisScore;}

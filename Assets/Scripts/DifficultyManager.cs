@@ -5,7 +5,7 @@ using UnityEngine;
 namespace OodModels
 {
     //break out functionality from GameManager, MonoBehaviour is for Start/StopCoroutine()
-    //only want one per game I think, perhaps call it StaticDifficultyManager? 
+    //only want one per game I think, perhaps call it StaticDifficultyManager 
     public class DifficultyManager
     {
         //Create the private singleton instance - can't new MonoBehaviour() hence the _mono solution
@@ -20,6 +20,7 @@ namespace OodModels
         private DifficultyManager() { }
 
         //introducing a monobehaviour object reference to run coroutines
+        //decided that for just this functionality it wasn't worth inheriting
         private static MonoBehaviour _mono = null;
         public static MonoBehaviour mono {
             protected get {return _mono;}
