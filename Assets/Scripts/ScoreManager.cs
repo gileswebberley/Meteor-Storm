@@ -8,6 +8,11 @@ namespace OodModels
         public ScoreData data {
             get {return _thisScore;}
         } 
+        //add in a dictionary that holds various scores and then make it a static
+        //singleton so everyone can access rather than having to find the object created
+        //in another object so _thisScore will be set according to the name of the score 
+        //referenced by name of the dictionary entry
+
         //score will always remain above or at zero
         //protected int _score = 0;
         public int score {
@@ -34,6 +39,11 @@ namespace OodModels
             }else if(_thisScore.score <= toRemove){
                 _thisScore.score = 0;
             }
+        }
+
+        public void ResetScore()
+        {
+            _thisScore.score = 0;
         }
     }
 }

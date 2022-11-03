@@ -81,6 +81,7 @@ public class PlayerController : MonoBehaviour
         gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
         damageText = transform.Find("Strength").gameObject;
         damageText.SetActive(false);
+
         //Strength slider is attached in the Editor
         //get the fill of the strength slider so it can be updated
         sliderFill = strengthSlider.fillRect.gameObject;
