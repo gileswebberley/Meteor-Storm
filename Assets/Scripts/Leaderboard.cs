@@ -1,14 +1,14 @@
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 namespace OodModels
 {
     //This was originally ScoreManager! realised that this is something to use WITH scores not FOR them
+    [System.Serializable]
     public abstract class Leaderboard
     {
         //make the leaderboard itself large and then use leaderboardSize for what we work with? 
-        protected List<ScoreData> leaderboardArray = new List<ScoreData>(100);
+        [SerializeField] protected List<ScoreData> leaderboardArray = new List<ScoreData>(100);
 
         //default constructor
         public Leaderboard()
@@ -84,8 +84,11 @@ namespace OodModels
         protected virtual List<ScoreData> GetLeaderboardRaw(){
             List<ScoreData> temp = new List<ScoreData>(_leaderboardSize);//use GetRange(0,_leaderboardSize)?
             for(int i = 0; i < _leaderboardSize; i++){
+                //this is where it fails as leaderboardArray has only saved as {}, although ScoreData serialises properly
+                Debug.Log($"i: {i} Leaderboard size: {leaderboardArray.Count}");
                 temp.Add(leaderboardArray[i]);
-            }
+            }  
+            //List<ScoreData> temp = leaderboardArray.GetRange(0,_leaderboardSize);
             return temp;
         }
 
@@ -104,77 +107,5 @@ namespace OodModels
             }
         }
 
-    }
-
-    public class FileLeaderboard : Leaderboard
-    {
-        public FileLeaderboard(string name){
-            _leaderboardName = name;
-        }
-        public override void AddToLeaderboard(string name, int score)
-        {
-            ScoreData newScore = new ScoreData(name, score);
-            AddToLeaderboard(newScore);
-        }
-
-        //make this abstract
-        public override void AddToLeaderboard(ScoreData newScore)
-        {
-            LoadLeaderboard(_leaderboardName);
-            //dealing with the underlying List<ScoreData> so use inherited method
-            AddToLeaderboardRaw(newScore);//should this be base.AddToLeaderboard(ScoreData)?
-            SaveLeaderboard(_leaderboardName);
-        }
-
-        public override void LoadLeaderboard(string name)
-        {
-            //I'm not sure about whether this should happen in here?? might you want to load another one into here?
-            //I've decided that if you load one by name you would expect it to save as that one unless specified
-            //so I won't set in the save version (like a Save and Save As... options with a document)
-            //set the internal file name for AddToLeaderboard() auto load/save
-            _leaderboardName = name;
-            if (!LoadLeaderboard())
-            {
-                //then save it, as if it's been requested and doesn't exist it probably should now?
-                SaveLeaderboard();
-            }
-        }
-
-        //will load leaderboard set via leaderboardName property directly from the user object
-        public override bool LoadLeaderboard(){
-            if (File.Exists(Application.persistentDataPath + "/" + _leaderboardName + ".json"))
-            {
-                string jsonStr = File.ReadAllText(Application.persistentDataPath + "/" + _leaderboardName + ".json");
-                leaderboardArray = JsonUtility.FromJson<List<ScoreData>>(jsonStr);
-                return true;
-            }
-            else
-            {
-                //set up a default leaderboardArray of leaderboardSize length
-                int i = 0;
-                do
-                {
-                    leaderboardArray.Add(new ScoreData());//fill with ScoreData default constructor
-                    ++i;
-                } while (i < leaderboardSize);
-                return false;
-            }
-        }
-
-        //Like the Save As... functionality
-        public override void SaveLeaderboard(string name)
-        {
-            //_leaderboardName = name;
-            string jsonStr = JsonUtility.ToJson(leaderboardArray);
-            File.WriteAllText(Application.persistentDataPath + "/" + name + ".json", jsonStr);
-        }
-
-        //and the save the last loaded leaderboard
-        public override bool SaveLeaderboard()
-        {
-            string jsonStr = JsonUtility.ToJson(leaderboardArray);
-            File.WriteAllText(Application.persistentDataPath + "/" + _leaderboardName + ".json", jsonStr);
-            return true;
-        }
     }
 }

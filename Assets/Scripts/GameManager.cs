@@ -105,11 +105,16 @@ public class GameManager : MonoBehaviour
         spawn.StopSpawning();
         player.DisablePlayer();
         DifficultyManager.Instance.StopDifficultyStepTimer();
-
         //adding to the leaderboard
         leaderboard.AddToLeaderboard(scorer.data);
-        leaderboard.SaveLeaderboard();
-        //StopCoroutine("DifficultyChangeTimer");
+        //no need for this as it is saved as part of the adding process
+        //leaderboard.SaveLeaderboard();
+        //just for testing as something is awry
+        // List<ScoreData> lb = leaderboard.GetLeaderboard();
+        // foreach(ScoreData s in lb)
+        // {
+        //     Debug.Log($"Score {lb.IndexOf(s)}: {s.name} : {s.score}");
+        // }
     }
 
     public void StartGame()
@@ -121,6 +126,13 @@ public class GameManager : MonoBehaviour
         DifficultyManager.Instance.SetDifficulty(1);
         //make an auto difficulty change happen every difficultyChangeTime(seconds)
         DifficultyManager.Instance.StartDifficultyStepTimer(difficultyChangeTime);
+        
+        //just for testing as something is awry
+        List<ScoreData> lb = leaderboard.GetLeaderboard();
+        foreach(ScoreData s in lb)
+        {
+            Debug.Log($"Score {lb.IndexOf(s)}: {s.name} : {s.score}");
+        }
         // ++ use Awake()
         //player.EnablePlayer(playerStrength, playerPower);
         player.EnablePlayer();

@@ -29,7 +29,7 @@ namespace OodModels
         {
             if(y == null)return 1;
             //else
-            return this.score - y.score;
+            return this.score.CompareTo(y.score);//this.score - y.score;
         }
     }
 }
