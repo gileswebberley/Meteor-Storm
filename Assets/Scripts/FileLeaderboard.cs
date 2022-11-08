@@ -37,6 +37,7 @@ namespace OodModels
                 //then save it, as if it's been requested and doesn't exist it probably should now?
                 //this logic is now in LoadLeaderboard when it doesn't exist
                 //SaveLeaderboard();
+                Debug.LogError($"LOAD FAILED: leaderboard named {name} did not exist and so a default leaderboard has been constructed");
             }
         }
 
@@ -46,7 +47,7 @@ namespace OodModels
             {
                 string jsonStr = File.ReadAllText(Application.persistentDataPath + "/" + _leaderboardName + ".json");
                 //not working so tested with saving a single ScoreData object which worked....
-                leaderboardArray = JsonUtility.FromJson<List<ScoreData>>(jsonStr);
+                leaderboardArray = JsonUtility.FromJson<ScoreDataList<ScoreData>>(jsonStr);
                 //Debug.Log($"LoadLeaderboard {_leaderboardName} : {leaderboardArray[0]}");
                 return true;
             }
@@ -58,10 +59,11 @@ namespace OodModels
                 int i = 0;
                 do
                 {
-                    leaderboardArray.Add(new ScoreData());//fill with ScoreData default constructor
-                    Debug.Log($"{i+1} Scores added to leaderboard in LoadLeaderboard()");
+                    leaderboardArray.list.Add(new ScoreData());//fill with ScoreData default constructor
+                    //Debug.Log($"{i+1} Scores added to leaderboard in LoadLeaderboard()");
                     ++i;
                 } while (i < leaderboardSize);
+
                 //save the default leaderboard now we've created a blank one
                 SaveLeaderboard();
                 return false;
@@ -74,17 +76,18 @@ namespace OodModels
         public override void SaveLeaderboard(string name)
         {
             string jsonStr = JsonUtility.ToJson(leaderboardArray);
+            Debug.Log($"SaveLeaderboard({name}) : {jsonStr}");
             File.WriteAllText(Application.persistentDataPath + "/" + name + ".json", jsonStr);
         }
 
         //and the save the last loaded leaderboard
-        public override bool SaveLeaderboard()
+        public override void SaveLeaderboard()
         {
-            //NOT WORKING - producing "{}" and that's it
-            string jsonStr = JsonUtility.ToJson(leaderboardArray);//leaderboardArray[0] makes {"name":"Guest","score":0}
-            Debug.Log($"SaveLeaderboard({_leaderboardName}) : {jsonStr}");
-            File.WriteAllText(Application.persistentDataPath + "/" + _leaderboardName + ".json", jsonStr);
-            return true;
+            //FIXED - (NOT WORKING - producing "{}" and that's it) - Implemented ScoreDataList<ScoreData> to fix
+            // string jsonStr = JsonUtility.ToJson(leaderboardArray);
+            // File.WriteAllText(Application.persistentDataPath + "/" + _leaderboardName + ".json", jsonStr);
+            SaveLeaderboard(_leaderboardName);
+            //return true;
         }
 
         public List<ScoreData> GetLeaderboard()

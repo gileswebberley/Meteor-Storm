@@ -4,16 +4,16 @@ using UnityEngine;
 namespace OodModels
 {
     //This was originally ScoreManager! realised that this is something to use WITH scores not FOR them
-    [System.Serializable]
     public abstract class Leaderboard
     {
         //make the leaderboard itself large and then use leaderboardSize for what we work with? 
-        [SerializeField] protected List<ScoreData> leaderboardArray = new List<ScoreData>(100);
+        //Sort() is not working as expected
+        [SerializeField] protected ScoreDataList<ScoreData> leaderboardArray = new ScoreDataList<ScoreData>();
 
         //default constructor
         public Leaderboard()
         {
-            leaderboardArray.Capacity = _leaderboardCapacity;
+            leaderboardArray.list.Capacity = _leaderboardCapacity;
         }
 
         //just so we keep control of the size of memory used
@@ -22,7 +22,7 @@ namespace OodModels
             get {return _leaderboardCapacity;}
             set {
                 _leaderboardCapacity = value;
-                leaderboardArray.Capacity = _leaderboardCapacity;
+                leaderboardArray.list.Capacity = _leaderboardCapacity;
                 }//this could be dangerous if threaded?
         }
         //private because changing has an effect on the internal List
@@ -56,24 +56,24 @@ namespace OodModels
         //return success
         public abstract bool LoadLeaderboard();
         //the derived class method of saving using _leaderboardName
-        public abstract bool SaveLeaderboard();
+        public abstract void SaveLeaderboard();
 
         //Provided in here as it is only dealing with the underlying data
         protected void AddToLeaderboardRaw(ScoreData newScore)
         {
-            if (leaderboardArray != null)
+            if (leaderboardArray.list != null)
             {
                 //--------- extract out
-                leaderboardArray.Add(newScore);
+                leaderboardArray.list.Add(newScore);
                 //then sort based on the ScoreData Comparable I hope - doesn't seem to be working
-                leaderboardArray.Sort();
+                leaderboardArray.list.Sort();
 
-                Debug.Log($"New score (rank): {newScore.name} : {newScore.score} ({leaderboardArray.IndexOf(newScore)+1}) added to the {_leaderboardName} leaderboard");
+                Debug.Log($"New score (rank): {newScore.name} : {newScore.score} ({leaderboardArray.list.IndexOf(newScore)+1}) added to the {_leaderboardName} leaderboard");
                 //if we're about to resize the list clip off the last entry to enforce capacity
-                if (leaderboardArray.Count >= leaderboardArray.Capacity - 1)
+                if (leaderboardArray.list.Count >= leaderboardArray.list.Capacity - 1)
                 {
                     //then get rid of the lowest score
-                    leaderboardArray.RemoveAt(leaderboardArray.Count);
+                    leaderboardArray.list.RemoveAt(leaderboardArray.list.Count);
                 }
                 //-----------to here
             }else{
@@ -84,24 +84,27 @@ namespace OodModels
         protected virtual List<ScoreData> GetLeaderboardRaw(){
             List<ScoreData> temp = new List<ScoreData>(_leaderboardSize);//use GetRange(0,_leaderboardSize)?
             for(int i = 0; i < _leaderboardSize; i++){
-                //this is where it fails as leaderboardArray has only saved as {}, although ScoreData serialises properly
-                Debug.Log($"i: {i} Leaderboard size: {leaderboardArray.Count}");
-                temp.Add(leaderboardArray[i]);
+                //Catch Out Of Bounds exceptions in case the list is shorter than _leaderboardSize
+                try{
+                    temp.Add(leaderboardArray.list[i]);
+                }catch{
+                    temp.Add(new ScoreData());
+                }
             }  
-            //List<ScoreData> temp = leaderboardArray.GetRange(0,_leaderboardSize);
+            //List<ScoreData> temp = leaderboardArray.list.GetRange(0,_leaderboardSize);
             return temp;
         }
 
         private void ChangeLeaderboardSize(int s)
         {
             //keep the array tidy
-            if (s > leaderboardArray.Capacity)
+            if (s > leaderboardArray.list.Capacity)
             {
-                //it's bigger than the leaderboardArray.Capacity - using List now
-                Debug.LogError($"Leaderboard size set: {s} is too large!! maximum: {leaderboardArray.Capacity}");
-                _leaderboardSize = leaderboardArray.Capacity;
+                //it's bigger than the leaderboardArray.list.Capacity - using List now
+                Debug.LogError($"Leaderboard size set: {s} is too large!! maximum: {leaderboardArray.list.Capacity}");
+                _leaderboardSize = leaderboardArray.list.Capacity;
             }
-            else if (s < leaderboardArray.Capacity)
+            else if (s < leaderboardArray.list.Capacity)
             {
                 _leaderboardSize = s;
             }
