@@ -10,13 +10,13 @@ using IModels;
 
 public class GameManager : MonoBehaviour
 {
-    // //create singleton Instance
-    // private static GameManager _instance;
-    // public static GameManager Instance
-    // {
-    //     get { return _instance; }
-    //     protected set { _instance = value; }
-    // }
+    //create singleton Instance
+    private static GameManager _instance;
+    public static GameManager Instance
+    {
+        get { return _instance; }
+        protected set { _instance = value; }
+    }
     private bool gameOver = false;
 
     //How long to wait before upping the difficulty, default 1 minute
@@ -50,15 +50,15 @@ public class GameManager : MonoBehaviour
     //This runs before the Start() method, use to instantiate objects of a class
     void Awake()
     {
-        // //make sure there's only one otherwise it's not much of a singleton
-        // if (Instance != null)
-        // {
-        //     //this is not the first instance of MainManager so our singleton already exists
-        //     Destroy(gameObject);
-        // }
-        // Instance = this;
-        // //to make persistant between scenes
-        // DontDestroyOnLoad(gameObject);
+        //make sure there's only one otherwise it's not much of a singleton
+        if (Instance != null)
+        {
+            //this is not the first instance of MainManager so our singleton already exists
+            Destroy(gameObject);
+        }
+        Instance = this;
+        //to make persistant between scenes
+        DontDestroyOnLoad(gameObject);
         
         //Set up our centralised playable bounds to reduce the need for player and spawner to communicate
         //minBounds.z is the "closest" z-value - used for bounds checking in MoveForward
