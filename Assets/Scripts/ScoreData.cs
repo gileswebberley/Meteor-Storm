@@ -36,9 +36,9 @@ namespace OodModels
         public int CompareTo(ScoreData y)
         {
             if(y == null)return 1;
-            Console.WriteLine($"Comparing scores - {this.score} and {y.score}");
+            //Console.WriteLine($"Comparing scores - {this.score} and {y.score}");
             //else
-            return this.score.CompareTo(y.score);//this.score - y.score;
+            return y.score.CompareTo(this.score);//this.score - y.score;
         }
     }
 }

@@ -40,9 +40,9 @@ public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy//MonoBeh
     }
 
     protected override void Update()
-    {
+    {//this checks that the GameObject will add/remove itself from the counter
         //we want to change the death behaviour so don't run base.Update();
-        if(!RbAddForwardForce()){//means we're out of GameBounds.z
+        if(!RbAddForwardForce()){//means we're out of GameBounds.z//this checks that the GameObject will add/remove itself from the counter
             RemoveFromSpawn();
             //Destroy(gameObject);
         }
@@ -83,8 +83,6 @@ public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy//MonoBeh
                 //add my original power to the player score
                 gameHQ.UpdateScore(((int)startPower));//warning casting to int
                 RemoveFromSpawn();
-                //destroyed
-                //Destroy(gameObject);
             }
         }
     }

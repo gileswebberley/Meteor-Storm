@@ -41,17 +41,13 @@ public class SpawnManager : SpawnerBase
     
 
     void Start()
-    {
-        
+    {        
         //how do I check if the enemy implements the ISpawnedEnemy interface?
-        if(meteorPrefabs[0].GetComponent<MeteorBehaviour>() is ISpawnedEnemy){
-            //so, this is coming through as a way to check that enemies implement
-            //the interface that adds and removes themselves from the currentEnemyCount
-            Debug.Log("ENEMY PREFAB IS ISpawnedEnemy");
-        }
-        
-
-        //RestartSpawn();
+        // if(meteorPrefabs[0].GetComponent<MeteorBehaviour>() is ISpawnedEnemy){
+        //     //so, this is coming through as a way to check that enemies implement
+        //     //the interface that adds and removes themselves from the currentEnemyCount
+        //     Debug.Log("ENEMY PREFAB IS ISpawnedEnemy");
+        // }
     }
 
     void Awake(){
@@ -60,8 +56,6 @@ public class SpawnManager : SpawnerBase
         maxSpawnY = GameBounds.maxY;
         minSpawnX = GameBounds.minX;
         minSpawnY = GameBounds.minY;
-        //reference to game manager
-        //gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
     }
 
     // Update is called once per frame
@@ -69,20 +63,21 @@ public class SpawnManager : SpawnerBase
     {
         if(!bIsSpawning) return;
         //If there are too few meteors then spawn another wave of everything
-        //More efficient way than using FindObjectsOfType every time
+        //More efficient way than using FindObjectsOfType every time I think
         if(currentSpawnedEnemies < minSpawnAmount * DifficultyManager.difficulty){
             SpawnAll();
             Debug.Log("SpawnAll() called from Update()");
         }
     }
 
-    //Abstraction of the resetting of fields to a start state
+    //resetting of fields to a start state
     private void ResetSpawnZ(){
         Debug.Log("ResetSpawnZ() called");
         maxSpawnZ = GameBounds.maxZ/spawnZMoveMultiplier;
         minSpawnZ = GameBounds.minZ - spawnZMoveOffset;
     }
 
+    //Produces the close up first spawn and then shifts z-bounds
     public override void StartSpawn(){
         SpawnAll();
         Debug.Log("SpawnAll() called from StartSpawn() ");
@@ -93,41 +88,72 @@ public class SpawnManager : SpawnerBase
         bHasStarted = true;
     }
 
-    //Public interface of Spawnable
+    //If first spawn has already occured shift the z-bounds back to close up
     public override void RestartSpawn(){
         if(bHasStarted){
             ResetSpawnZ();
         }
         StartSpawn();
     }
-    //Public interface of Spawnable
+
+    //Public interface of Spawnable - stops all spawning
     public override void StopSpawning(){
         Debug.Log("StopSpawning() called");
         bIsSpawning = false;
         //ResetSpawnZ();
     }
-    //Abstraction that every Spawnable must implement - this should be split into SpawnEnemies and SpawnBonuses
+    //Abstraction that every Spawnable must implement - this can be split into SpawnEnemies and SpawnBonuses
     public override void SpawnAll(){
+        SpawnEnemies();
+        SpawnBonuses();
+        
+    }
+
+    //Checks that enemies implement ISpawnedEnemy then does specific spawning
+    public override void SpawnEnemies()
+    {
+        bool enemyOk = true;
+        //all objects with the MeteorBehaviour componenet are enemies
+        //Check that our enemies implement ISpawnedEnemy with a type check
+        foreach(GameObject o in meteorPrefabs){
+            //this checks that the GameObject will add/remove itself from the counter
+            if(!o is ISpawnedEnemy)//VSCode says this won't work but it does
+            {
+                Debug.LogError("ENEMY PREFAB (meteor) IS NOT OF TYPE ISpawnedEnemy - unable to spawn");
+                enemyOk = false;
+                break;
+            }
+        }
+        foreach(GameObject o in planetPrefabs){
+            //this checks that the GameObject will add/remove itself from the counter
+            if(!o is ISpawnedEnemy)//VSCode says this won't work but it does
+            {
+                Debug.LogError("ENEMY PREFAB (planet) IS NOT OF TYPE ISpawnedEnemy - unable to spawn");
+                enemyOk = false;
+                break;
+            }
+        }
+
+        if(enemyOk){
+            int diff = DifficultyManager.difficulty;
+            //make it based on a difficulty, so as it gets more difficult you get more meteors and less power ups
+            SpawnMeteors(minSpawnAmount*diff,maxSpawnAmount*diff);
+            //these are mainly for the enviromental aesthetic
+            SpawnPlanets(1,3);
+        }
+    }
+
+    //Implementation of non-enemy spawning
+    public override void SpawnBonuses()
+    {
         int diff = DifficultyManager.difficulty;
-        //make it based on a difficulty, so as it gets more difficult you get more meteors and less power ups
-        SpawnMeteors(minSpawnAmount*diff,maxSpawnAmount*diff);
         //we want this to be controllable so less as it gets harder
         SpawnPowerUps(minSpawnAmount/diff,maxSpawnAmount/diff);
-        //both of these are mainly for the enviromental aesthetic
-        //++make them damage massively if hit 
-        SpawnPlanets(1,3);
+        //these are mainly for the enviromental aesthetic
+        //++make them damage massively if hit
         SpawnStars(minSpawnAmount/3,maxSpawnAmount/3);
     }
 
-    public override void SpawnEnemies()
-    {
-
-    }
-
-    public override void SpawnBonuses()
-    {
-        
-    }
     //These could be derived class (3DSpaceSpawner) behaviour that is put in to honour our Spawnability
     void SpawnPlanets(int min, int max){
         //we don't want many planets, they're rather rare
@@ -135,7 +161,7 @@ public class SpawnManager : SpawnerBase
         //Planets can be outside of bounds for environmental decoration        
         for(int i = 0; i < totalSpawn; i++){
             int randomSelection = Random.Range(0,planetPrefabs.Length);
-            //use the utility function inherited from SpawnerBase
+            //use the utility function inherited from SpawnerBase set to 10 so they are spread around the environment
             Vector3 birthPos = GetRandomStartPosition(10f);
             birthPos.z /= 10f;
             Instantiate(planetPrefabs[randomSelection],birthPos,planetPrefabs[randomSelection].transform.rotation);
@@ -147,8 +173,9 @@ public class SpawnManager : SpawnerBase
         
         for(int i = 0; i < totalSpawn; i++){
             int randomSelection = Random.Range(0,meteorPrefabs.Length);
+            GameObject selection = meteorPrefabs[randomSelection];
             Vector3 birthPos = GetRandomStartPosition();
-            Instantiate(meteorPrefabs[randomSelection],birthPos,meteorPrefabs[randomSelection].transform.rotation);
+            Instantiate(selection,birthPos,selection.transform.rotation);
         }
     }
     void SpawnStars(int min, int max){

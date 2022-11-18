@@ -4,21 +4,72 @@ using UnityEngine;
 using UnityEngine.UI;
 //for the GameBounds singleton
 using OodModels;
+using GilesManagers;
 
+[RequireComponent(typeof(StrengthManager))]
 public class PlayerController : MonoBehaviour
-{
-    public Slider strengthSlider;
-    private GameObject sliderFill;
-    private GameObject damageText;
-    //very important boolean - for IPlayable
+{    
+    //Implement damage/strength
+    // private float strength = 500f;
+    // //strength set by artist saved for resetting
+    // [SerializeField] private float startStrength = 500f;
+    // //set by artist and used for strength slider UI
+    // [SerializeField] private float maxStrength = 1000f;
+    // //the UnityEngine.UI component
+    // public Slider strengthSlider;
+    // //the fill component of the strength slider UI
+    // private GameObject sliderFill;
+    // //game object container for strength UI
+    // private GameObject strengthUIArea;
+
+    //very important boolean - for IPlayable me thinks
     private bool bIsPlaying = false;
+
+    //Weaponisation related items
+    private float power = 0f;
+    [SerializeField] private float startPower = 10f;
+    [SerializeField] private float maxPower = 20f;
+    //the laser power related UI - should perhaps be part of a IWeapon?
+    private GameObject powerIndicator;
+    //amount to move the sliding component of the UI above
+    private float indicatorMoveStep;
+    //how much power each round has so the victims can check how much to remove from themselves
+    private float laserPower = 1f;
+    //number of rounds per full power load (so number of shots with max power)
+    private float laserPowerUsageDivisor = 100f;
+    //originally had this as maxPower so it would be 1 when on full power - deprecated
+    //private float laserPowerDivisor;
+    //lock used for Firing input control
+    private bool bIsFiring = false;
+    //time step control for Firing input
+    private float roundsPerSecond = 10f;
+    //the game object to be "fired"
     [SerializeField] private GameObject laser;
 
     private GameManager gameHQ;
+
+    //Movement related control system
     private Rigidbody playerRB;
+    //all the speed based properties -------
+    //affects control twitchyness, other objects use it to make it feel like speed has changed
+    private float speed = 10f;
+    private float minSpeed = 5f;
+    private float maxSpeed = 20f;
+
+    //Rotational movement system
+    //the amount of torque added by imaginary booster rockets (help get control back when spinning)using System.Collections;
+    private float rotationalBoosters = 0.5f;
+    //The number by which targetVector.x is divided within AddTorque()
+    private float rotationalDamper = 30f;
+    //now using to reset player on restart
+    private float originalAngularDrag;
+    //trying to get the position to reset on Restart()
+    private Quaternion originalRotation;
+
+    //Movement mouse input tracking - can be improved by using GetAxis("Mouse X"/"Mouse Y") I think 
     //takes into account where the mouse is when game starts, might be better to just have around the centre
     private Vector3 originalMousePosition;
-    //was used in kinematic first attempt
+    //was used in kinematic first attempt, just to keep z position under control
     private Vector3 targetPosition;
     //this is essentially THE vector to use with AddForce()
     private Vector3 targetVector;
@@ -29,42 +80,10 @@ public class PlayerController : MonoBehaviour
 
     //deprecated for GameBounds use instead
     // //maximum devation across
-    private float xBounds;
+    //private float xBounds;
     // //maximum deviation up and down
-    private float yBounds;
-
-    //all the speed based properties -------
-    //affects control twitchyness, other objects use it to make it feel like speed has changed
-    private float speed = 10f;
-    private float minSpeed = 5f;
-    private float maxSpeed = 20f;
-    //the amount of torque added by imaginary booster rockets (help get control back when spinning)using System.Collections;
-    private float rotationalBoosters = 0.5f;
-    //The number by which targetVector.x is divided within AddTorque()
-    private float rotationalDamper = 30f;
-    //now using to reset player on restart
-    private float originalAngularDrag;
-
-    private float power = 0f;
-    [SerializeField] private float startPower = 10f;
-    [SerializeField] private float maxPower = 20f;
-    private float indicatorMoveStep;
-    private GameObject powerIndicator;
-    //how much power so the victims can check how much to remove from themselves
-    private float laserPower = 1f;
-    //to use up power when firing rather than limit the firing, a divisor of maxPower
-    private float laserPowerUsageDivisor = 100f;//so number of shots with max power
-    //originally had this as maxPower so it would be 1 when on full power
-    private float laserPowerDivisor;
-    private bool bIsFiring = false;
-    private float roundsPerSecond = 10f;
-    //Implement damage
-    private float strength = 500f;
-    [SerializeField] private float startStrength = 500f;
-    [SerializeField] private float maxStrength = 1000f;
-
-    //trying to get the position to reset on Restart()
-    private Quaternion originalRotation;
+    //private float yBounds;
+    private StrengthManager strengthManager;
 
     // Start is called before the first frame update
     void Start()
@@ -81,14 +100,18 @@ public class PlayerController : MonoBehaviour
         indicatorMoveStep = -0.5f / maxPower;
         //connect with game manager
         gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
-        damageText = transform.Find("Strength").gameObject;
-        damageText.SetActive(false);
+
+        //grab the strength manager
+        strengthManager = GetComponent<StrengthManager>();
+        // strengthManager.Enable();
+        // strengthUIArea = transform.Find("Strength").gameObject;
+        // strengthUIArea.SetActive(false);
 
         //Strength slider is attached in the Editor
         //get the fill of the strength slider so it can be updated
-        sliderFill = strengthSlider.fillRect.gameObject;
+        // sliderFill = strengthSlider.fillRect.gameObject;
         //set the divisor for lasers so on max power it has a value of 2 - deprecated for now (playability)
-        laserPowerDivisor = maxPower/2f;
+        //laserPowerDivisor = maxPower/2f;
         //Get the rigidbody so we can add our forces for a more natural game experience
         playerRB = GetComponent<Rigidbody>();
         //to reset on EnablePlayer() 
@@ -131,33 +154,34 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate(){
         if(!bIsPlaying) return; 
         MoveMe(targetVector);
-        //this comes second as it does bounds checking which uses MoveMe() as well
-        UpdateTargetVector();
     }
 
     void LateUpdate(){
-        
+        if(!bIsPlaying) return;
+        //this comes second as it does bounds checking which uses MoveMe() as well
+        UpdateTargetVector();
     }
 
     public void DisablePlayer(){
         bIsPlaying = false;
         //yep, so it can hide the text and the indicator
-        damageText.SetActive(false);
+        strengthUIArea.SetActive(false);
         playerRB.angularDrag = originalAngularDrag + 20f;
     }
 
     public void EnablePlayer(float aStrength, float aPower){
         playerRB.MoveRotation(originalRotation);
         playerRB.angularDrag = originalAngularDrag;
+
+        strengthManager.Enable();
         //set the slider parameters to match the strength
-        //maxStrength = aStrength;
-        strengthSlider.maxValue = maxStrength;
-        //a test whether I've grabbed the correct game object
-        //yep, so it can hide the text and the indicator
-        damageText.SetActive(true);
-        strength = 0;
+        // strengthSlider.maxValue = maxStrength;
+        // //a test whether I've grabbed the correct game object
+        // //yep, so it can hide the text and the indicator
+        // strengthUIArea.SetActive(true);
+        // strength = 0;
         //use this so it looks after the UI component
-        AddStrengthLevel(aStrength);
+        strengthManager.AddStrengthLevel(aStrength);
         speed = minSpeed;
         AddPowerLevel(-power);
         AddPowerLevel(aPower);
@@ -180,11 +204,12 @@ public class PlayerController : MonoBehaviour
         }
         else if(other.CompareTag("StrengthUp")){
             //add a bit of strenth
-            AddStrengthLevel(maxStrength/10f);
+            strengthManager.AddStrengthLevel(strengthManager.maxStrength/10f);
             Destroy(other.gameObject);
         }else if(other.CompareTag("Star")){
             //death by a star, damage is based on mass in rigidbody
-            AddDamageLevel(other.gameObject);
+            GameObject otherGO = other.gameObject;
+            strengthManager.AddDamageLevel(CalculateRbDamage(otherGO));
         }
     }
 
@@ -223,7 +248,7 @@ public class PlayerController : MonoBehaviour
             //lasers use the power
             AddPowerLevel(-(maxPower/laserPowerUsageDivisor));
             //pause trigger based on roundsPerSecond
-            StartCoroutine("LimitShotsPerSecond");
+            StartCoroutine(LimitShotsPerSecond());
         }
     }
 
@@ -243,47 +268,63 @@ public class PlayerController : MonoBehaviour
         // These collisions cause damage based on the mass of other
         if(other.gameObject.CompareTag("Planet")){//why are these if statements here?
             // You've bumped into a planet
-            AddDamageLevel(other.gameObject);
+            GameObject otherGO = other.gameObject;
+            strengthManager.AddDamageLevel(CalculateRbDamage(otherGO));
         }
         if(other.gameObject.CompareTag("Meteor")){
             // You've bumped into a meteor
-            AddDamageLevel(other.gameObject);
+            GameObject otherGO = other.gameObject;
+            strengthManager.AddDamageLevel(CalculateRbDamage(otherGO));
         }
     }
 
+    //use speed and rigidbody mass to calculate the damage level due to a collision
+    float CalculateRbDamage(GameObject otherGO)
+    {
+            //How big was the hit? Basic sum based on mass and speed
+            //using polymorphism with MoveForwardRb which is the base moving class
+            float damage = speed + otherGO.GetComponent<MoveForwardRb>().speed;
+            damage += otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
+            return damage;
+    }
+
     //Implement damage which is based on the mass of what's hit you
-    //when it get's to zero it's GAME OVER
-    void AddDamageLevel(GameObject otherGO){
+    //when it get's to zero it's GAME OVER - to extract it out into a class
+    void AddDamageLevel(float damage){
         //How big was the hit? Basic sum based on mass and speed
         //using polymorphism with MoveForwardRb which is the base moving class
-        float damage = speed + otherGO.GetComponent<MoveForwardRb>().speed + otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
+        //float damage = speed + otherGO.GetComponent<MoveForwardRb>().speed + otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
         strength -= damage;
         Debug.Log("DAMAGE: Strength is now: "+strength);
 
         //If we are completely damaged it's game over
         if(strength <= 0 && bIsPlaying){
             //GameOver calls DisablePlayer()
-            gameHQ.GameOver();
             strength = 0;
+            gameHQ.GameOver();
         }
-        sliderFill.SetActive(true);
-        strengthSlider.value = strength;
+        UpdateStrengthIndicator();
     }
     //the opposite of AddDamageLevel()
     void AddStrengthLevel(float toAdd){
         if(toAdd < 0){
-            Debug.LogError("Please use AddDamageLevel(gameobject) to remove strength");
+            Debug.LogError("No Negative values allowed in AddStrengthLevel() Please use AddDamageLevel() to \"remove strength\"");
         }
         else{
             strength += toAdd;
             //maxes out at it's start value
             if(strength >= maxStrength){
                 strength = maxStrength;
-            }            
-            sliderFill.SetActive(true);
-            strengthSlider.value = strength;
-            Debug.Log("ADD: Strength is now: "+strength);
+            } 
+            UpdateStrengthIndicator();
         }
+    }
+
+    void UpdateStrengthIndicator()
+    {
+        sliderFill.SetActive(true);
+        strengthSlider.value = strength;
+        Debug.Log("ADD: Strength is now: "+strength);
     }
 
     //returns multiplier for targetVector [bInXBounds,bInYBounds,1] and pushes gameObject back into bounds

@@ -14,15 +14,15 @@ namespace OodModels
         private GameProperties()
         {
             Properties = new Dictionary<string, object>()
-        {
-            //set up some default properties
-            {"Player Speed",null},
-            {"Player Strength", null},
-            {"PLayer Damage", null},
-            {"Weapon Power",null},
-            {"Difficulty",null},
+            {
+                //set up some default properties
+                {"Player Speed",null},
+                {"Player Strength", null},
+                {"PLayer Damage", null},
+                {"Weapon Power",null},
+                {"Difficulty",null},
 
-        };
+            };
         }
         //Property to encapsulate the _instance
         //only needed to access non-static members
@@ -32,6 +32,14 @@ namespace OodModels
         }
 
         private Dictionary<string, object> Properties;
+
+        public object GetGameProperty(string key)
+        {
+            if(Properties.ContainsKey(key)){
+                return Properties[key];
+            }
+            return null;
+        }
 
         public void AddGameProperty(string key, object val)
         {
