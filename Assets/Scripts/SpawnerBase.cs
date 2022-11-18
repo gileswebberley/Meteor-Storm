@@ -58,6 +58,8 @@ public abstract class SpawnerBase : MonoBehaviour, ISpawnable {
     public abstract void RestartSpawn();
     public abstract void StopSpawning();
     public abstract void SpawnAll();
+    public abstract void SpawnEnemies();
+    public abstract void SpawnBonuses();
 
     //Handy utility function for children, marked virtual so that it CAN be overridden if required
     protected virtual Vector3 GetRandomStartPosition(float BoundsSizeMultiplier = 1f)
