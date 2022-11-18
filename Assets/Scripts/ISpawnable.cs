@@ -36,6 +36,8 @@ namespace IModels
         abstract void RestartSpawn();
         abstract void StopSpawning();
         abstract void SpawnAll();
+        abstract void SpawnEnemies();
+        abstract void SpawnBonuses();
     }
 
     //as a way to track numbers without using FindObjectsOfType<MeteorBehaviour>
@@ -47,5 +49,15 @@ namespace IModels
         abstract void RemoveFromSpawn();
         //create your reference to the ISpawnable in here
         abstract void AddToSpawn();
+    }
+
+    public interface IPlayer
+    {
+        float power {get;}
+        float strength {get;}
+        void EnablePlayer();
+
+        void EnablePlayer(float power, float strength);
+        void DisablePlayer();
     }
 }

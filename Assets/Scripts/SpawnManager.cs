@@ -12,6 +12,8 @@ using IModels;
     to the Player game object just to get the x and y bounds, which are more for a
     GameWorld type object? Maybe a struct (or interface of properties) within GameManager?
 */
+
+//This derivation of SpawnerBase requires the use of a DifficultyManager and a GameBounds
 public class SpawnManager : SpawnerBase
 {
     //3DSpaceSpawn specific library of objects to be spawning
@@ -24,8 +26,8 @@ public class SpawnManager : SpawnerBase
     //should player be available through the GameManager rather than directly from all these classes?
     //Created a GameBounds singleton class with static properties
 
-    //gameHQ is only used to get the current difficulty
-    private GameManager gameHQ;
+    //gameHQ is only used to get the current difficulty - now via DifficultyManager
+    //private GameManager gameHQ;
     //No longer time based spawning but still here for now - maybe this should be a seperate TimeSpawnable interface?
     private float maxSpawnTime;
     private float spawnTime;
@@ -40,12 +42,14 @@ public class SpawnManager : SpawnerBase
 
     void Start()
     {
-        /*
-        how do I check if the enemy implements the ISpawnedEnemy interface?
-        if(!meteorPrefabs[0].GetComponent<MeteorBehaviour>() is ISpawnedEnemy){
-            Debug.LogError("ENEMY PREFAB IS NOT ISpawnedEnemy");
+        
+        //how do I check if the enemy implements the ISpawnedEnemy interface?
+        if(meteorPrefabs[0].GetComponent<MeteorBehaviour>() is ISpawnedEnemy){
+            //so, this is coming through as a way to check that enemies implement
+            //the interface that adds and removes themselves from the currentEnemyCount
+            Debug.Log("ENEMY PREFAB IS ISpawnedEnemy");
         }
-        */
+        
 
         //RestartSpawn();
     }
@@ -57,7 +61,7 @@ public class SpawnManager : SpawnerBase
         minSpawnX = GameBounds.minX;
         minSpawnY = GameBounds.minY;
         //reference to game manager
-        gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
+        //gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
     }
 
     // Update is called once per frame
@@ -113,6 +117,16 @@ public class SpawnManager : SpawnerBase
         //++make them damage massively if hit 
         SpawnPlanets(1,3);
         SpawnStars(minSpawnAmount/3,maxSpawnAmount/3);
+    }
+
+    public override void SpawnEnemies()
+    {
+
+    }
+
+    public override void SpawnBonuses()
+    {
+        
     }
     //These could be derived class (3DSpaceSpawner) behaviour that is put in to honour our Spawnability
     void SpawnPlanets(int min, int max){
