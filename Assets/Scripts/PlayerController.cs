@@ -165,7 +165,7 @@ public class PlayerController : MonoBehaviour
     public void DisablePlayer(){
         bIsPlaying = false;
         //yep, so it can hide the text and the indicator
-        strengthUIArea.SetActive(false);
+        strengthManager.Disable();
         playerRB.angularDrag = originalAngularDrag + 20f;
     }
 
@@ -190,7 +190,7 @@ public class PlayerController : MonoBehaviour
 
     public void EnablePlayer()
     {
-        EnablePlayer(startStrength,startPower);
+        EnablePlayer(strengthManager.startStrength,startPower);
     }
 
     // Behaviour when hit by collider with isTrigger = true
@@ -290,42 +290,42 @@ public class PlayerController : MonoBehaviour
 
     //Implement damage which is based on the mass of what's hit you
     //when it get's to zero it's GAME OVER - to extract it out into a class
-    void AddDamageLevel(float damage){
-        //How big was the hit? Basic sum based on mass and speed
-        //using polymorphism with MoveForwardRb which is the base moving class
-        //float damage = speed + otherGO.GetComponent<MoveForwardRb>().speed + otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
-        strength -= damage;
-        Debug.Log("DAMAGE: Strength is now: "+strength);
+    // void AddDamageLevel(float damage){
+    //     //How big was the hit? Basic sum based on mass and speed
+    //     //using polymorphism with MoveForwardRb which is the base moving class
+    //     //float damage = speed + otherGO.GetComponent<MoveForwardRb>().speed + otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
+    //     strength -= damage;
+    //     Debug.Log("DAMAGE: Strength is now: "+strength);
 
-        //If we are completely damaged it's game over
-        if(strength <= 0 && bIsPlaying){
-            //GameOver calls DisablePlayer()
-            strength = 0;
-            gameHQ.GameOver();
-        }
-        UpdateStrengthIndicator();
-    }
+    //     //If we are completely damaged it's game over
+    //     if(strength <= 0 && bIsPlaying){
+    //         //GameOver calls DisablePlayer()
+    //         strength = 0;
+    //         gameHQ.GameOver();
+    //     }
+    //     UpdateStrengthIndicator();
+    // }
     //the opposite of AddDamageLevel()
-    void AddStrengthLevel(float toAdd){
-        if(toAdd < 0){
-            Debug.LogError("No Negative values allowed in AddStrengthLevel() Please use AddDamageLevel() to \"remove strength\"");
-        }
-        else{
-            strength += toAdd;
-            //maxes out at it's start value
-            if(strength >= maxStrength){
-                strength = maxStrength;
-            } 
-            UpdateStrengthIndicator();
-        }
-    }
+    // void AddStrengthLevel(float toAdd){
+    //     if(toAdd < 0){
+    //         Debug.LogError("No Negative values allowed in AddStrengthLevel() Please use AddDamageLevel() to \"remove strength\"");
+    //     }
+    //     else{
+    //         strength += toAdd;
+    //         //maxes out at it's start value
+    //         if(strength >= maxStrength){
+    //             strength = maxStrength;
+    //         } 
+    //         UpdateStrengthIndicator();
+    //     }
+    // }
 
-    void UpdateStrengthIndicator()
-    {
-        sliderFill.SetActive(true);
-        strengthSlider.value = strength;
-        Debug.Log("ADD: Strength is now: "+strength);
-    }
+    // void UpdateStrengthIndicator()
+    // {
+    //     sliderFill.SetActive(true);
+    //     strengthSlider.value = strength;
+    //     Debug.Log("ADD: Strength is now: "+strength);
+    // }
 
     //returns multiplier for targetVector [bInXBounds,bInYBounds,1] and pushes gameObject back into bounds
     Vector3 CheckForBounds(){

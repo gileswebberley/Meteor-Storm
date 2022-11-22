@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace GilesManagers{
 public class StrengthManager : MonoBehaviour
@@ -12,7 +13,7 @@ public class StrengthManager : MonoBehaviour
     }
     //strength set by artist saved for resetting
     [SerializeField] private float _startStrength = 500f;
-    public float _startStrength {
+    public float startStrength {
         get {return _startStrength;}
     }
     //set by artist and used for strength slider UI
@@ -21,11 +22,11 @@ public class StrengthManager : MonoBehaviour
         get {return _maxStrength;}
     }
     //the UnityEngine.UI component
-    [SerializedField] private Slider strengthSlider;
+    [SerializeField] private Slider strengthSlider;
     //the fill component of the strength slider UI
     private GameObject sliderFill;
     //game object container for strength UI
-    [SerializedField] private GameObject strengthUIArea;
+    [SerializeField] private GameObject strengthUIArea;
 
     public void Enable()
     {
@@ -37,7 +38,7 @@ public class StrengthManager : MonoBehaviour
         //a test whether I've grabbed the correct game object
         //yep, so it can hide the text and the indicator
         strengthUIArea.SetActive(true);
-        strength = 0;
+        _strength = 0;
     }
 
     public void Disable()
@@ -53,7 +54,7 @@ public class StrengthManager : MonoBehaviour
 
     //Implement damage which is based on the mass of what's hit you
     //when it get's to zero it's GAME OVER - to extract it out into a class
-    void AddDamageLevel(float damage){
+    public bool AddDamageLevel(float damage){
         //How big was the hit? Basic sum based on mass and speed
         //using polymorphism with MoveForwardRb which is the base moving class
         //float damage = speed + otherGO.GetComponent<MoveForwardRb>().speed + otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
@@ -61,24 +62,26 @@ public class StrengthManager : MonoBehaviour
         Debug.Log("DAMAGE: Strength is now: "+strength);
 
         //If we are completely damaged it's game over
-        if(_strength <= 0 && bIsPlaying){
+        if(_strength <= 0){
             //GameOver calls DisablePlayer()
             _strength = 0;
+            return false;
             //gameHQ.GameOver();
         }
         UpdateStrengthIndicator();
+        return true;
     }
 
     //the opposite of AddDamageLevel()
-    void AddStrengthLevel(float toAdd){
+    public void AddStrengthLevel(float toAdd){
         if(toAdd < 0){
             Debug.LogError("No Negative values allowed in AddStrengthLevel() Please use AddDamageLevel() to \"remove strength\"");
         }
         else{
-            strength += toAdd;
+            _strength += toAdd;
             //maxes out at it's start value
             if(strength >= maxStrength){
-                strength = maxStrength;
+                _strength = maxStrength;
             } 
             UpdateStrengthIndicator();
         }

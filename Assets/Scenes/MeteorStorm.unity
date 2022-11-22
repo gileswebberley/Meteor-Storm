@@ -833,6 +833,7 @@ GameObject:
   - component: {fileID: 858532422}
   - component: {fileID: 858532420}
   - component: {fileID: 858532421}
+  - component: {fileID: 858532423}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -952,12 +953,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cc159d19759876248efd954c9363e43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  strengthSlider: {fileID: 1623015967}
-  laser: {fileID: 2662479520080950041, guid: b2fcfb1c07428f058a24901fe54e1f04, type: 3}
   startPower: 10
   maxPower: 20
-  startStrength: 200
-  maxStrength: 1000
+  laser: {fileID: 2662479520080950041, guid: b2fcfb1c07428f058a24901fe54e1f04, type: 3}
 --- !u!65 &858532422
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -971,6 +969,22 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.38917276, y: 0.8725311, z: 0.41510546}
   m_Center: {x: -0.010740573, y: 0.09417618, z: -0.58258325}
+--- !u!114 &858532423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 858532415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8e21036d4afcc58faa6a0842287ce8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _startStrength: 500
+  _maxStrength: 1000
+  strengthSlider: {fileID: 1623015967}
+  strengthUIArea: {fileID: 1378387771}
 --- !u!1 &874395027
 GameObject:
   m_ObjectHideFlags: 0
