@@ -45,7 +45,7 @@ public class StrengthManager : MonoBehaviour
 
     public virtual void EnableUI()
     {
-        //strengthUIArea = GameObject.Find("Strength").gameObject;
+        //strengthUIArea = GameObject.FindGameObjectWithTag("Strength").gameObject;//GameObject.Find("Strength").gameObject;
         //Strength slider is attached in the Editor
         //get the fill of the strength slider so it can be updated
         sliderFill = strengthSlider.fillRect.gameObject;

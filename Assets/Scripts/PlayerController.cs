@@ -45,6 +45,8 @@ public class PlayerController : MonoBehaviour
     private float roundsPerSecond = 10f;
     //the game object to be "fired"
     [SerializeField] private GameObject laser;
+    //an empty gameobject placeholder for where the lasers are fired
+    [SerializeField] private GameObject gunPosition;
 
     private GameManager gameHQ;
 
@@ -209,7 +211,7 @@ public class PlayerController : MonoBehaviour
         }else if(other.CompareTag("Star")){
             //death by a star, damage is based on mass in rigidbody
             GameObject otherGO = other.gameObject;
-            strengthManager.AddDamageLevel(CalculateRbDamage(otherGO));
+            if(!strengthManager.AddDamageLevel(CalculateRbDamage(otherGO))) gameHQ.GameOver();
         }
     }
 
@@ -241,8 +243,8 @@ public class PlayerController : MonoBehaviour
         //check that we have power to fire
         if(laserPower > 0 && !bIsFiring){
             bIsFiring = true;
-            Vector3 gunPosition = new Vector3(transform.position.x,transform.position.y+1, transform.position.z-3);
-            GameObject shot = Instantiate(laser,gunPosition,transform.rotation);
+            //Vector3 gunPosition = new Vector3(transform.position.x,transform.position.y+1, transform.position.z-3);
+            GameObject shot = Instantiate(laser,gunPosition.transform.position,gunPosition.transform.rotation);
             //++ I want to have the lasers be affected by our current direction to add to playability
             shot.GetComponent<Rigidbody>().AddForce(targetVector*speed/2,ForceMode.Impulse);
             //lasers use the power
@@ -269,12 +271,12 @@ public class PlayerController : MonoBehaviour
         if(other.gameObject.CompareTag("Planet")){//why are these if statements here?
             // You've bumped into a planet
             GameObject otherGO = other.gameObject;
-            strengthManager.AddDamageLevel(CalculateRbDamage(otherGO));
+            if(!strengthManager.AddDamageLevel(CalculateRbDamage(otherGO))) gameHQ.GameOver();
         }
         if(other.gameObject.CompareTag("Meteor")){
             // You've bumped into a meteor
             GameObject otherGO = other.gameObject;
-            strengthManager.AddDamageLevel(CalculateRbDamage(otherGO));
+            if(!strengthManager.AddDamageLevel(CalculateRbDamage(otherGO))) gameHQ.GameOver();
         }
     }
 

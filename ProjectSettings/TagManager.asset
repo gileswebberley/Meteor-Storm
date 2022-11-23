@@ -12,6 +12,7 @@ TagManager:
   - LaserShot
   - ScoreText
   - StrengthUp
+  - Strength
   layers:
   - Default
   - TransparentFX

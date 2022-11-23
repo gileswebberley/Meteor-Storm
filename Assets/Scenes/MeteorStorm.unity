@@ -309,7 +309,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 700
   field of view: 39
   orthographic: 0
   orthographic size: 5
@@ -335,14 +335,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
-  m_LocalRotation: {x: 0, y: 0.68567866, z: -0.7279044, w: 0}
-  m_LocalPosition: {x: -0.000008438575, y: 0.36, z: -0.7}
-  m_LocalScale: {x: 0.44247788, y: 0.44247776, z: 0.44247776}
-  m_ConstrainProportionsScale: 0
+  m_LocalRotation: {x: 0, y: 0.7071068, z: -0.7071068, w: 0}
+  m_LocalPosition: {x: 0, y: 0.36, z: -0.7}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 858532419}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 93.422, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 180, z: 0}
 --- !u!114 &330585547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -922,6 +922,7 @@ Transform:
   - {fileID: 750760078}
   - {fileID: 1378387772}
   - {fileID: 874395028}
+  - {fileID: 1881004620}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
@@ -956,6 +957,7 @@ MonoBehaviour:
   startPower: 10
   maxPower: 20
   laser: {fileID: 2662479520080950041, guid: b2fcfb1c07428f058a24901fe54e1f04, type: 3}
+  gunPosition: {fileID: 1881004619}
 --- !u!65 &858532422
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -981,7 +983,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8e21036d4afcc58faa6a0842287ce8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _startStrength: 500
+  _startStrength: 200
   _maxStrength: 1000
   strengthSlider: {fileID: 1623015967}
   strengthUIArea: {fileID: 1378387771}
@@ -1570,7 +1572,7 @@ GameObject:
   - component: {fileID: 1378387773}
   m_Layer: 5
   m_Name: Strength
-  m_TagString: Untagged
+  m_TagString: Strength
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2048,6 +2050,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 354953835}
   m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1881004619
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1881004620}
+  m_Layer: 0
+  m_Name: Gun Position
+  m_TagString: Untagged
+  m_Icon: {fileID: 3443629218296621865, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1881004620
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1881004619}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.905, z: -0.371}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 858532419}
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2059998650
 GameObject:
