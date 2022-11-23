@@ -21,15 +21,31 @@ public class StrengthManager : MonoBehaviour
     public float maxStrength {
         get {return _maxStrength;}
     }
-    //the UnityEngine.UI component
+    //the UnityEngine.UI component set in Editor
     [SerializeField] private Slider strengthSlider;
     //the fill component of the strength slider UI
     private GameObject sliderFill;
-    //game object container for strength UI
+    //game object container for strength UI set in Editor
     [SerializeField] private GameObject strengthUIArea;
+
+    //I was going to implement a listener for game over but instead decided to
+    //return a boolean from AddDamageLevel() which can be examined for death
 
     public void Enable()
     {
+       EnableUI();
+        _strength = 0;
+    }
+
+    public void Disable()
+    {        
+        //strengthUIArea.SetActive(false);
+        DisableUI();
+    }
+
+    public virtual void EnableUI()
+    {
+        //strengthUIArea = GameObject.Find("Strength").gameObject;
         //Strength slider is attached in the Editor
         //get the fill of the strength slider so it can be updated
         sliderFill = strengthSlider.fillRect.gameObject;
@@ -38,17 +54,15 @@ public class StrengthManager : MonoBehaviour
         //a test whether I've grabbed the correct game object
         //yep, so it can hide the text and the indicator
         strengthUIArea.SetActive(true);
-        _strength = 0;
     }
 
-    public void Disable()
+    public virtual void DisableUI()
     {        
         strengthUIArea.SetActive(false);
     }
 
     void Awake()
-    {        
-        strengthUIArea = GameObject.Find("Strength").gameObject;
+    {
         Disable();
     }
 
@@ -68,7 +82,7 @@ public class StrengthManager : MonoBehaviour
             return false;
             //gameHQ.GameOver();
         }
-        UpdateStrengthIndicator();
+        UpdateUI();
         return true;
     }
 
@@ -83,11 +97,11 @@ public class StrengthManager : MonoBehaviour
             if(strength >= maxStrength){
                 _strength = maxStrength;
             } 
-            UpdateStrengthIndicator();
+            UpdateUI();
         }
     }
 
-    void UpdateStrengthIndicator()
+    protected virtual void UpdateUI()
     {
         sliderFill.SetActive(true);
         strengthSlider.value = strength;

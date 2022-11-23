@@ -289,67 +289,38 @@ public class PlayerController : MonoBehaviour
     }
 
     //Implement damage which is based on the mass of what's hit you
-    //when it get's to zero it's GAME OVER - to extract it out into a class
-    // void AddDamageLevel(float damage){
-    //     //How big was the hit? Basic sum based on mass and speed
-    //     //using polymorphism with MoveForwardRb which is the base moving class
-    //     //float damage = speed + otherGO.GetComponent<MoveForwardRb>().speed + otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
-    //     strength -= damage;
-    //     Debug.Log("DAMAGE: Strength is now: "+strength);
-
-    //     //If we are completely damaged it's game over
-    //     if(strength <= 0 && bIsPlaying){
-    //         //GameOver calls DisablePlayer()
-    //         strength = 0;
-    //         gameHQ.GameOver();
-    //     }
-    //     UpdateStrengthIndicator();
-    // }
-    //the opposite of AddDamageLevel()
-    // void AddStrengthLevel(float toAdd){
-    //     if(toAdd < 0){
-    //         Debug.LogError("No Negative values allowed in AddStrengthLevel() Please use AddDamageLevel() to \"remove strength\"");
-    //     }
-    //     else{
-    //         strength += toAdd;
-    //         //maxes out at it's start value
-    //         if(strength >= maxStrength){
-    //             strength = maxStrength;
-    //         } 
-    //         UpdateStrengthIndicator();
-    //     }
-    // }
-
-    // void UpdateStrengthIndicator()
-    // {
-    //     sliderFill.SetActive(true);
-    //     strengthSlider.value = strength;
-    //     Debug.Log("ADD: Strength is now: "+strength);
+    //when it get's to zero it's GAME OVER - to extract it out into a class - StrengthManager
+    
     // }
 
     //returns multiplier for targetVector [bInXBounds,bInYBounds,1] and pushes gameObject back into bounds
     Vector3 CheckForBounds(){
         Vector3 temp = new Vector3(1,1,1);
+        Vector3 tempMoveMe = new Vector3(0,0,0);
+        bool isHittingBounds = false;
+        //gonna try to move this to the GameBounds class as a method
+        Vector3 tempTransform = new Vector3(transform.position.x + targetVector.x,transform.position.y + targetVector.y,1);
         //gone too wide so push us back into the middle and return [0,y,1] 
         if(transform.position.x + targetVector.x > GameBounds.maxX){
             temp.x = 0;
-            MoveMe(Vector3.left);
-            //playerRB.AddForce(Vector3.left*speed,ForceMode.Impulse);
+            tempMoveMe.x = -1;
+            isHittingBounds = true;
         }else if(transform.position.x + targetVector.x < GameBounds.minX){            
             temp.x = 0;
-            MoveMe(Vector3.right);
-            //playerRB.AddForce(Vector3.right*speed,ForceMode.Impulse);
+            tempMoveMe.x = 1;
+            isHittingBounds = true;
         }
         //gone too high or low so push us back into the middle and return[x,0,1]
         if(transform.position.y + targetVector.y > GameBounds.maxY){
             temp.y = 0;
-            MoveMe(Vector3.down);
-            //playerRB.AddForce(Vector3.down,ForceMode.Impulse);
+            tempMoveMe.y = -1;
+            isHittingBounds = true;
         }else if(transform.position.y + targetVector.y < GameBounds.minY){            
             temp.y = 0;
-            MoveMe(Vector3.up);
-            //playerRB.AddForce(Vector3.up,ForceMode.Impulse);
+            tempMoveMe.y = 1;
+            isHittingBounds = true;
         }
+        if(isHittingBounds) MoveMe(tempMoveMe);
         return temp;
     }
 
