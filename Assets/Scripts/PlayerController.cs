@@ -9,18 +9,7 @@ using GilesManagers;
 [RequireComponent(typeof(StrengthManager))]
 public class PlayerController : MonoBehaviour
 {    
-    //Implement damage/strength
-    // private float strength = 500f;
-    // //strength set by artist saved for resetting
-    // [SerializeField] private float startStrength = 500f;
-    // //set by artist and used for strength slider UI
-    // [SerializeField] private float maxStrength = 1000f;
-    // //the UnityEngine.UI component
-    // public Slider strengthSlider;
-    // //the fill component of the strength slider UI
-    // private GameObject sliderFill;
-    // //game object container for strength UI
-    // private GameObject strengthUIArea;
+    //Implement damage/strength - See StrengthManager
 
     //very important boolean - for IPlayable me thinks
     private bool bIsPlaying = false;
@@ -102,16 +91,8 @@ public class PlayerController : MonoBehaviour
         indicatorMoveStep = -0.5f / maxPower;
         //connect with game manager
         gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
-
         //grab the strength manager
-        strengthManager = GetComponent<StrengthManager>();
-        // strengthManager.Enable();
-        // strengthUIArea = transform.Find("Strength").gameObject;
-        // strengthUIArea.SetActive(false);
-
-        //Strength slider is attached in the Editor
-        //get the fill of the strength slider so it can be updated
-        // sliderFill = strengthSlider.fillRect.gameObject;
+        strengthManager = GetComponent<StrengthManager>();        
         //set the divisor for lasers so on max power it has a value of 2 - deprecated for now (playability)
         //laserPowerDivisor = maxPower/2f;
         //Get the rigidbody so we can add our forces for a more natural game experience
@@ -271,6 +252,7 @@ public class PlayerController : MonoBehaviour
         if(other.gameObject.CompareTag("Planet")){//why are these if statements here?
             // You've bumped into a planet
             GameObject otherGO = other.gameObject;
+            //if AddDamageLevel makes strength below zero it returns false, so then call GameOver()
             if(!strengthManager.AddDamageLevel(CalculateRbDamage(otherGO))) gameHQ.GameOver();
         }
         if(other.gameObject.CompareTag("Meteor")){
@@ -289,11 +271,6 @@ public class PlayerController : MonoBehaviour
             damage += otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
             return damage;
     }
-
-    //Implement damage which is based on the mass of what's hit you
-    //when it get's to zero it's GAME OVER - to extract it out into a class - StrengthManager
-    
-    // }
 
     //returns multiplier for targetVector [bInXBounds,bInYBounds,1] and pushes gameObject back into bounds
     Vector3 CheckForBounds(){
@@ -344,7 +321,7 @@ public class PlayerController : MonoBehaviour
         }
         //first take away where the mouse was at the start so it's just about where it is in relation 
         targetVector = Input.mousePosition - originalMousePosition;
-        //make the movement a float (0.0-1.0) by dividing it by the screen size
+        //make the movement normalised (0.0-1.0) by dividing it by the screen size
         targetVector.x /= screenModifier.x;
         targetVector.y /= screenModifier.y;
         //reverse the x-axis
@@ -369,10 +346,6 @@ public class PlayerController : MonoBehaviour
     //c# deals with encapsulation
     public float GetSpeed(){
         return speed;
-    }
-
-    public float GetMaxSpeed(){
-        return maxSpeed;
     }
 
     void ChangeSpeed(float n){

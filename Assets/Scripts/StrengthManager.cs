@@ -107,18 +107,5 @@ public class StrengthManager : MonoBehaviour
         strengthSlider.value = strength;
         Debug.Log("ADD: Strength is now: "+strength);
     }
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
 }
