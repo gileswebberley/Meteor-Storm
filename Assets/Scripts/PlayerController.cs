@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 //for the GameBounds singleton
 using OodModels;
+using IModels;
 using GilesManagers;
 
 [RequireComponent(typeof(StrengthManager))]
@@ -74,7 +75,7 @@ public class PlayerController : MonoBehaviour
     //private float xBounds;
     // //maximum deviation up and down
     //private float yBounds;
-    private StrengthManager strengthManager;
+    private IStrengthManager strengthManager;
 
     // Start is called before the first frame update
     void Start()
