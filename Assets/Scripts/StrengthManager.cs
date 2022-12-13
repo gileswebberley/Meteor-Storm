@@ -1,107 +1,42 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using IModels;
 
-namespace GilesManagers{
-public class StrengthManager : MonoBehaviour
+namespace GilesManagers
 {
-    //Implement damage/strength
-    private float _strength = 500f;
-    public float strength {
-        get {return _strength;}
-    }
-    //strength set by artist saved for resetting
-    [SerializeField] private float _startStrength = 500f;
-    public float _startStrength {
-        get {return _startStrength;}
-    }
-    //set by artist and used for strength slider UI
-    [SerializeField] private float _maxStrength = 1000f;
-    public float maxStrength {
-        get {return _maxStrength;}
-    }
-    //the UnityEngine.UI component
-    [SerializedField] private Slider strengthSlider;
-    //the fill component of the strength slider UI
-    private GameObject sliderFill;
-    //game object container for strength UI
-    [SerializedField] private GameObject strengthUIArea;
-
-    public void Enable()
+    public class StrengthManager : StrengthManagerBase, IStrengthManager
     {
-        //Strength slider is attached in the Editor
-        //get the fill of the strength slider so it can be updated
-        sliderFill = strengthSlider.fillRect.gameObject;
-        //set the slider parameters to match the strength
-        strengthSlider.maxValue = maxStrength;
-        //a test whether I've grabbed the correct game object
-        //yep, so it can hide the text and the indicator
-        strengthUIArea.SetActive(true);
-        strength = 0;
-    }
+        //the UnityEngine.UI component set in Editor
+        [SerializeField] private Slider strengthSlider;
+        //the fill component of the strength slider UI
+        private GameObject sliderFill;
+        //game object container for strength UI set in Editor
+        [SerializeField] private GameObject strengthUIArea;
 
-    public void Disable()
-    {        
-        strengthUIArea.SetActive(false);
-    }
-
-    void Awake()
-    {        
-        strengthUIArea = GameObject.Find("Strength").gameObject;
-        Disable();
-    }
-
-    //Implement damage which is based on the mass of what's hit you
-    //when it get's to zero it's GAME OVER - to extract it out into a class
-    void AddDamageLevel(float damage){
-        //How big was the hit? Basic sum based on mass and speed
-        //using polymorphism with MoveForwardRb which is the base moving class
-        //float damage = speed + otherGO.GetComponent<MoveForwardRb>().speed + otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
-        _strength -= damage;
-        Debug.Log("DAMAGE: Strength is now: "+strength);
-
-        //If we are completely damaged it's game over
-        if(_strength <= 0 && bIsPlaying){
-            //GameOver calls DisablePlayer()
-            _strength = 0;
-            //gameHQ.GameOver();
+        public override void EnableUI()
+        {
+            //Strength slider is attached in the Editor
+            //get the fill of the strength slider so it can be updated
+            sliderFill = strengthSlider.fillRect.gameObject;
+            //set the slider parameters to match the strength
+            strengthSlider.maxValue = _maxStrength;
+            //a test whether I've grabbed the correct game object
+            //yep, so it can hide the text and the indicator
+            strengthUIArea.SetActive(true);
         }
-        UpdateStrengthIndicator();
-    }
 
-    //the opposite of AddDamageLevel()
-    void AddStrengthLevel(float toAdd){
-        if(toAdd < 0){
-            Debug.LogError("No Negative values allowed in AddStrengthLevel() Please use AddDamageLevel() to \"remove strength\"");
+        public override void DisableUI()
+        {
+            strengthUIArea.SetActive(false);
         }
-        else{
-            strength += toAdd;
-            //maxes out at it's start value
-            if(strength >= maxStrength){
-                strength = maxStrength;
-            } 
-            UpdateStrengthIndicator();
+
+        public override void UpdateUI()
+        {
+            sliderFill.SetActive(true);
+            strengthSlider.value = strength;
+            Debug.Log("ADD: Strength is now: " + _strength);
         }
     }
-
-    void UpdateStrengthIndicator()
-    {
-        sliderFill.SetActive(true);
-        strengthSlider.value = strength;
-        Debug.Log("ADD: Strength is now: "+strength);
-    }
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-}
 }

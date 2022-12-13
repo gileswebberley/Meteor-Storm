@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.0031563276, g: 0.0027327389, b: 0.0033656592, a: 1}
+  m_IndirectSpecularColor: {r: 0.0031509986, g: 0.0027332786, b: 0.0033495585, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -97,7 +97,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: 6b8c9b1c1932071099776ca426a35fff,
+    type: 2}
   m_LightingSettings: {fileID: 0}
 --- !u!196 &4
 NavMeshSettings:
@@ -309,7 +310,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 700
   field of view: 39
   orthographic: 0
   orthographic size: 5
@@ -335,14 +336,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
-  m_LocalRotation: {x: 0, y: 0.68567866, z: -0.7279044, w: 0}
-  m_LocalPosition: {x: -0.000008438575, y: 0.36, z: -0.7}
-  m_LocalScale: {x: 0.44247788, y: 0.44247776, z: 0.44247776}
-  m_ConstrainProportionsScale: 0
+  m_LocalRotation: {x: 0, y: 0.7071068, z: -0.7071068, w: 0}
+  m_LocalPosition: {x: 0, y: 0.36, z: -0.7}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 858532419}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 93.422, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 180, z: 0}
 --- !u!114 &330585547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -693,7 +694,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 750760077}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.3, z: 0}
   m_LocalScale: {x: 1, y: 0.52, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -833,6 +834,8 @@ GameObject:
   - component: {fileID: 858532422}
   - component: {fileID: 858532420}
   - component: {fileID: 858532421}
+  - component: {fileID: 858532423}
+  - component: {fileID: 858532424}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -921,6 +924,7 @@ Transform:
   - {fileID: 750760078}
   - {fileID: 1378387772}
   - {fileID: 874395028}
+  - {fileID: 1881004620}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
@@ -952,12 +956,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cc159d19759876248efd954c9363e43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  strengthSlider: {fileID: 1623015967}
   laser: {fileID: 2662479520080950041, guid: b2fcfb1c07428f058a24901fe54e1f04, type: 3}
-  startPower: 10
-  maxPower: 20
-  startStrength: 200
-  maxStrength: 1000
+  gunPosition: {fileID: 1881004619}
 --- !u!65 &858532422
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -971,6 +971,38 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.38917276, y: 0.8725311, z: 0.41510546}
   m_Center: {x: -0.010740573, y: 0.09417618, z: -0.58258325}
+--- !u!114 &858532423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 858532415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8e21036d4afcc58faa6a0842287ce8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _startStrength: 200
+  _maxStrength: 1000
+  strengthSlider: {fileID: 1623015967}
+  strengthUIArea: {fileID: 1378387771}
+--- !u!114 &858532424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 858532415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 573693cea3cb6ce3682b662ca9796a04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _startStrength: 10
+  _maxStrength: 20
+  powerIndicator: {fileID: 750760077}
+  indicatorMoveRange: -0.7
 --- !u!1 &874395027
 GameObject:
   m_ObjectHideFlags: 0
@@ -1556,7 +1588,7 @@ GameObject:
   - component: {fileID: 1378387773}
   m_Layer: 5
   m_Name: Strength
-  m_TagString: Untagged
+  m_TagString: Strength
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2035,6 +2067,37 @@ Transform:
   m_Father: {fileID: 354953835}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1881004619
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1881004620}
+  m_Layer: 0
+  m_Name: Gun Position
+  m_TagString: Untagged
+  m_Icon: {fileID: 3443629218296621865, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1881004620
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1881004619}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.905, z: -0.371}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 858532419}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2059998650
 GameObject:
   m_ObjectHideFlags: 0
@@ -2272,7 +2335,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2122769223}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.7, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2288,7 +2351,7 @@ CapsuleCollider:
   m_GameObject: {fileID: 2122769223}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   m_Radius: 0.5000001
   m_Height: 2
   m_Direction: 1
@@ -2303,7 +2366,7 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
+  m_DynamicOccludee: 0
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
