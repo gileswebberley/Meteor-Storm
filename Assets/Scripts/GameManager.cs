@@ -69,7 +69,7 @@ public class GameManager : MonoBehaviour
         //Set up the static properties for difficulty
         DifficultyManager.maxDifficulty = 5;
         DifficultyManager.difficulty = 1;
-        //Try to set this calling MonoBehaviour object to run co-routines
+        //pass this MonoBehaviour object to run co-routines (for the timer)
         DifficultyManager.mono = this;
 
         //Try using score manager....

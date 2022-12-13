@@ -694,7 +694,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 750760077}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.3, z: 0}
   m_LocalScale: {x: 1, y: 0.52, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -835,6 +835,7 @@ GameObject:
   - component: {fileID: 858532420}
   - component: {fileID: 858532421}
   - component: {fileID: 858532423}
+  - component: {fileID: 858532424}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -955,8 +956,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cc159d19759876248efd954c9363e43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPower: 10
-  maxPower: 20
   laser: {fileID: 2662479520080950041, guid: b2fcfb1c07428f058a24901fe54e1f04, type: 3}
   gunPosition: {fileID: 1881004619}
 --- !u!65 &858532422
@@ -988,6 +987,22 @@ MonoBehaviour:
   _maxStrength: 1000
   strengthSlider: {fileID: 1623015967}
   strengthUIArea: {fileID: 1378387771}
+--- !u!114 &858532424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 858532415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 573693cea3cb6ce3682b662ca9796a04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _startStrength: 10
+  _maxStrength: 20
+  powerIndicator: {fileID: 750760077}
+  indicatorMoveRange: -0.7
 --- !u!1 &874395027
 GameObject:
   m_ObjectHideFlags: 0
@@ -2320,7 +2335,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2122769223}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.7, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2336,7 +2351,7 @@ CapsuleCollider:
   m_GameObject: {fileID: 2122769223}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   m_Radius: 0.5000001
   m_Height: 2
   m_Direction: 1
@@ -2351,7 +2366,7 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
+  m_DynamicOccludee: 0
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1

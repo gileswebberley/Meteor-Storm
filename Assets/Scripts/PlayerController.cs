@@ -16,13 +16,6 @@ public class PlayerController : MonoBehaviour
     private bool bIsPlaying = false;
 
     //Weaponisation related items
-    private float power = 0f;
-    [SerializeField] private float startPower = 10f;
-    [SerializeField] private float maxPower = 20f;
-    //the laser power related UI - should perhaps be part of a IWeapon?
-    private GameObject powerIndicator;
-    //amount to move the sliding component of the UI above
-    private float indicatorMoveStep;
     //how much power each round has so the victims can check how much to remove from themselves
     private float laserPower = 1f;
     //number of rounds per full power load (so number of shots with max power)
@@ -77,6 +70,8 @@ public class PlayerController : MonoBehaviour
     //private float yBounds;
     private IStrengthManager strengthManager;
 
+    private IStrengthManager powerManager;
+
     // Start is called before the first frame update
     void Start()
     {     
@@ -86,18 +81,15 @@ public class PlayerController : MonoBehaviour
 
     //Use Awake to get all your references (instantiate objects) to avoid the dreaded NullReferenceExeption
     void Awake(){
-        //use transform.Find for children game objects
-        powerIndicator = transform.Find("Power Level").gameObject;
-        //the float is the distance to move the power cylinder forwards to create the nice effect
-        indicatorMoveStep = -0.5f / maxPower;
         //connect with game manager
         gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
         //grab the strength manager
-        strengthManager = GetComponent<StrengthManager>();        
-        //set the divisor for lasers so on max power it has a value of 2 - deprecated for now (playability)
-        //laserPowerDivisor = maxPower/2f;
+        strengthManager = GetComponent<StrengthManager>(); 
+        //and the power manager (which is also a StrengthManagerBase with different UI behaviour)
+        powerManager = GetComponent<PowerManager>();
         //Get the rigidbody so we can add our forces for a more natural game experience
         playerRB = GetComponent<Rigidbody>();
+
         //to reset on EnablePlayer() 
         originalRotation = transform.rotation; 
         originalAngularDrag = playerRB.angularDrag;
@@ -150,31 +142,31 @@ public class PlayerController : MonoBehaviour
         bIsPlaying = false;
         //yep, so it can hide the text and the indicator
         strengthManager.Disable();
+        powerManager.Disable();
         playerRB.angularDrag = originalAngularDrag + 20f;
     }
 
+    //Reset strength, power, speed, rotation and set bIsPlaying = true;
     public void EnablePlayer(float aStrength, float aPower){
         playerRB.MoveRotation(originalRotation);
         playerRB.angularDrag = originalAngularDrag;
 
         strengthManager.Enable();
-        //set the slider parameters to match the strength
-        // strengthSlider.maxValue = maxStrength;
-        // //a test whether I've grabbed the correct game object
-        // //yep, so it can hide the text and the indicator
-        // strengthUIArea.SetActive(true);
-        // strength = 0;
-        //use this so it looks after the UI component
         strengthManager.AddStrengthLevel(aStrength);
+        powerManager.Enable();
+        //most reliable way - to remove any left over power
+        powerManager.AddDamageLevel(powerManager.strength);
+        //then add the start power
+        powerManager.AddStrengthLevel(aPower);
         speed = minSpeed;
-        AddPowerLevel(-power);
-        AddPowerLevel(aPower);
+        // AddPowerLevel(-power);
+        // AddPowerLevel(aPower);
         bIsPlaying = true;
     }
 
     public void EnablePlayer()
     {
-        EnablePlayer(strengthManager.startStrength,startPower);
+        EnablePlayer(strengthManager.startStrength,powerManager.startStrength);
     }
 
     // Behaviour when hit by collider with isTrigger = true
@@ -183,7 +175,7 @@ public class PlayerController : MonoBehaviour
         if(!bIsPlaying)return;
         if(other.CompareTag("ChargeUp")){
             //Charge up so add laser power
-            AddPowerLevel(1);
+            powerManager.AddStrengthLevel(1);// AddPowerLevel(1);
             Destroy(other.gameObject);
         }
         else if(other.CompareTag("StrengthUp")){
@@ -196,25 +188,6 @@ public class PlayerController : MonoBehaviour
             if(!strengthManager.AddDamageLevel(CalculateRbDamage(otherGO))) gameHQ.GameOver();
         }
     }
-
-    private void AddPowerLevel(float toAdd){
-        power += toAdd;
-        if(power <= 0){
-            //run out of power
-            power = 0;           
-        }
-        else if(power > maxPower){
-            power = maxPower;
-        }
-
-        UpdatePowerIndicator();
-    }
-
-    private void UpdatePowerIndicator(){
-        //Frustratingly it took me ages to realise that I had to use localPosition
-        powerIndicator.transform.localPosition = new Vector3(0.0f,indicatorMoveStep*power,0.0f);
-    }
-
     private void FireLaser(){
         //++ LimitShotsPerSecond() introduced
 
@@ -223,14 +196,14 @@ public class PlayerController : MonoBehaviour
         //laserPower = power/laserPowerDivisor;
 
         //check that we have power to fire
-        if(laserPower > 0 && !bIsFiring){
+        if(powerManager.strength > 0 && !bIsFiring){
             bIsFiring = true;
             //Vector3 gunPosition = new Vector3(transform.position.x,transform.position.y+1, transform.position.z-3);
             GameObject shot = Instantiate(laser,gunPosition.transform.position,gunPosition.transform.rotation);
             //++ I want to have the lasers be affected by our current direction to add to playability
             shot.GetComponent<Rigidbody>().AddForce(targetVector*speed/2,ForceMode.Impulse);
             //lasers use the power
-            AddPowerLevel(-(maxPower/laserPowerUsageDivisor));
+            powerManager.AddDamageLevel(powerManager.maxStrength/laserPowerUsageDivisor);
             //pause trigger based on roundsPerSecond
             StartCoroutine(LimitShotsPerSecond());
         }
@@ -250,15 +223,10 @@ public class PlayerController : MonoBehaviour
         if(!bIsPlaying)return;
         // Non collider collision behaviour here
         // These collisions cause damage based on the mass of other
-        if(other.gameObject.CompareTag("Planet")){//why are these if statements here?
+        if(other.gameObject.CompareTag("Planet") || other.gameObject.CompareTag("Meteor")){
             // You've bumped into a planet
             GameObject otherGO = other.gameObject;
             //if AddDamageLevel makes strength below zero it returns false, so then call GameOver()
-            if(!strengthManager.AddDamageLevel(CalculateRbDamage(otherGO))) gameHQ.GameOver();
-        }
-        if(other.gameObject.CompareTag("Meteor")){
-            // You've bumped into a meteor
-            GameObject otherGO = other.gameObject;
             if(!strengthManager.AddDamageLevel(CalculateRbDamage(otherGO))) gameHQ.GameOver();
         }
     }
