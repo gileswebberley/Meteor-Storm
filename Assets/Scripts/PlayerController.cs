@@ -15,21 +15,21 @@ public class PlayerController : MonoBehaviour
     //very important boolean - for IPlayable me thinks
     private bool bIsPlaying = false;
 
-    //Weaponisation related items
-    //how much power each round has so the victims can check how much to remove from themselves
-    private float laserPower = 1f;
-    //number of rounds per full power load (so number of shots with max power)
-    private float laserPowerUsageDivisor = 100f;
-    //originally had this as maxPower so it would be 1 when on full power - deprecated
-    //private float laserPowerDivisor;
-    //lock used for Firing input control
-    private bool bIsFiring = false;
-    //time step control for Firing input
-    private float roundsPerSecond = 10f;
-    //the game object to be "fired"
-    [SerializeField] private GameObject laser;
-    //an empty gameobject placeholder for where the lasers are fired
-    [SerializeField] private GameObject gunPosition;
+    // //Weaponisation related items
+    // //how much power each round has so the victims can check how much to remove from themselves
+    // private float laserPower = 1f;
+    // //number of rounds per full power load (so number of shots with max power)
+    // private float laserPowerUsageDivisor = 100f;
+    // //originally had this as maxPower so it would be 1 when on full power - deprecated
+    // //private float laserPowerDivisor;
+    // //lock used for Firing input control
+    // private bool bIsFiring = false;
+    // //time step control for Firing input
+    // private float roundsPerSecond = 10f;
+    // //the game object to be "fired"
+    // [SerializeField] private GameObject laser;
+    // //an empty gameobject placeholder for where the lasers are fired
+    // [SerializeField] private GameObject gunPosition;
 
     private GameManager gameHQ;
 
