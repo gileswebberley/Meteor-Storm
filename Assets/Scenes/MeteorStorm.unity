@@ -836,6 +836,7 @@ GameObject:
   - component: {fileID: 858532421}
   - component: {fileID: 858532423}
   - component: {fileID: 858532424}
+  - component: {fileID: 858532425}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -956,8 +957,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cc159d19759876248efd954c9363e43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  laser: {fileID: 2662479520080950041, guid: b2fcfb1c07428f058a24901fe54e1f04, type: 3}
-  gunPosition: {fileID: 1881004619}
 --- !u!65 &858532422
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1003,6 +1002,23 @@ MonoBehaviour:
   _maxStrength: 20
   powerIndicator: {fileID: 750760077}
   indicatorMoveRange: -0.7
+--- !u!114 &858532425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 858532415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 617960055e3876dba85ccbfd3f3b3955, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  laserPower: 1
+  maxRounds: 100
+  roundsPerSecond: 10
+  laser: {fileID: 2662479520080950041, guid: b2fcfb1c07428f058a24901fe54e1f04, type: 3}
+  gunPosition: {fileID: 1881004619}
 --- !u!1 &874395027
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace IModels
 {
@@ -50,34 +48,5 @@ namespace IModels
         abstract void RemoveFromSpawn();
         //create your reference to the ISpawnable in here
         abstract void AddToSpawn();
-    }
-
-    public interface IPlayer
-    {
-        float power { get; }
-        float strength { get; }
-        void EnablePlayer();
-
-        void EnablePlayer(float power, float strength);
-        void DisablePlayer();
-    }
-
-    public interface ILaser
-    {
-        //Weaponisation related items
-        //how much power each round has so the victims can check how much to remove from themselves
-        float laserPower { get; protected set; }
-        //number of rounds per full power load (so number of shots with max power)
-        float laserPowerUsageDivisor { get; protected set; }
-        //originally had this as maxPower so it would be 1 when on full power - deprecated
-        //private float laserPowerDivisor;
-        //lock used for Firing input control
-        bool bIsFiring { get; protected set; }
-        //time step control for Firing input
-        float roundsPerSecond { get; protected set; }
-        //the game object to be "fired"
-        GameObject laser { protected get; set; }
-        //an empty gameobject placeholder for where the lasers are fired
-        GameObject gunPosition { protected get; set; }
     }
 }
