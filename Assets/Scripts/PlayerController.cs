@@ -15,7 +15,7 @@ public class PlayerController : MonoBehaviour
 {
     //Implement damage/strength - See StrengthManager
 
-    //very important boolean - for IPlayable me thinks
+    //very important boolean - possible for IPlayable me thinks
     private bool bIsPlaying = false;
     private GameManager gameHQ;
 
@@ -98,9 +98,10 @@ public class PlayerController : MonoBehaviour
 
     void LateUpdate()
     {
-        // if (!bIsPlaying) return;
-        // //this comes second as it does bounds checking which uses MoveMe() as well
-        // UpdateTargetVector();
+        if (!bIsPlaying) return;
+        //this comes second as it does bounds checking which uses MoveMe() as well
+        //UpdateTargetVector();
+        CheckForBounds();
     }
 
 
@@ -133,6 +134,7 @@ public class PlayerController : MonoBehaviour
             playerRB.AddTorque(Vector3.forward * -rotationalBoosters * speed, ForceMode.Impulse);
         }
     }
+
     public void DisablePlayer()
     {
         bIsPlaying = false;
@@ -299,8 +301,8 @@ public class PlayerController : MonoBehaviour
         //check that we aren't going out of bounds and correct appropriately
         //this is in this method so that MoveMe() could stay pure, it's used in the bounds check
         //so would loop around pointlessly if moved to MoveMe() - don't do it!
-        Vector3 boundsCheck = CheckForBounds();
-        targetVector = Vector3.Scale(targetVector, boundsCheck);
+        // Vector3 boundsCheck = CheckForBounds();
+        // targetVector = Vector3.Scale(targetVector, boundsCheck);
     }
 
     void MoveMe(Vector3 target)
