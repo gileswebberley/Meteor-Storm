@@ -8,6 +8,9 @@ using IModels;
 using GilesManagers;
 
 [RequireComponent(typeof(StrengthManager))]
+[RequireComponent(typeof(PowerManager))]
+[RequireComponent(typeof(LaserWeapon))]
+
 public class PlayerController : MonoBehaviour
 {
     //Implement damage/strength - See StrengthManager
