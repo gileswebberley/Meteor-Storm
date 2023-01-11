@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 
 namespace IModels
@@ -24,7 +23,7 @@ namespace IModels
         public bool bHasStarted { get; }
         int minSpawnAmount { get; }
         int maxSpawnAmount { get; }
-        int currentSpawnedEnemies {get; set;}
+        int currentSpawnedEnemies { get; set; }
         float minSpawnX { get; }
         float maxSpawnX { get; }
         float minSpawnY { get; }
@@ -44,20 +43,10 @@ namespace IModels
     public interface ISpawnedEnemy
     {
         //must have a reference to the spawn manager that will keep the count
-        ISpawnable spawn {get;}
+        ISpawnable spawn { get; }
         //destroy game object when removed from spawn count
         abstract void RemoveFromSpawn();
         //create your reference to the ISpawnable in here
         abstract void AddToSpawn();
-    }
-
-    public interface IPlayer
-    {
-        float power {get;}
-        float strength {get;}
-        void EnablePlayer();
-
-        void EnablePlayer(float power, float strength);
-        void DisablePlayer();
     }
 }

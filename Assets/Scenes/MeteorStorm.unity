@@ -513,14 +513,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 410087039}
-  m_LocalRotation: {x: -0.33036613, y: -0.08852132, z: 0.24321029, w: 0.90767336}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.023148783, y: -0.27, z: -0.85}
-  m_LocalScale: {x: 0.44247788, y: 0.44247782, z: 0.4424778}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 858532419}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &410087042
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -535,7 +535,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Version: 1
   m_UsePipelineSettings: 1
-  m_AdditionalLightsShadowResolutionTier: 2
+  m_AdditionalLightsShadowResolutionTier: 0
   m_LightLayerMask: 1
   m_CustomShadowLayers: 0
   m_ShadowLayerMask: 1
@@ -829,13 +829,13 @@ GameObject:
   m_Component:
   - component: {fileID: 858532419}
   - component: {fileID: 858532418}
-  - component: {fileID: 858532417}
   - component: {fileID: 858532416}
   - component: {fileID: 858532422}
   - component: {fileID: 858532420}
   - component: {fileID: 858532421}
   - component: {fileID: 858532423}
   - component: {fileID: 858532424}
+  - component: {fileID: 858532425}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -857,48 +857,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &858532417
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 858532415}
-  m_Enabled: 0
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &858532418
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -943,7 +901,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 88
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!114 &858532421
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -956,8 +914,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cc159d19759876248efd954c9363e43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  laser: {fileID: 2662479520080950041, guid: b2fcfb1c07428f058a24901fe54e1f04, type: 3}
-  gunPosition: {fileID: 1881004619}
 --- !u!65 &858532422
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1003,6 +959,23 @@ MonoBehaviour:
   _maxStrength: 20
   powerIndicator: {fileID: 750760077}
   indicatorMoveRange: -0.7
+--- !u!114 &858532425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 858532415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 617960055e3876dba85ccbfd3f3b3955, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  laserPower: 1
+  maxRounds: 100
+  roundsPerSecond: 10
+  laser: {fileID: 2662479520080950041, guid: b2fcfb1c07428f058a24901fe54e1f04, type: 3}
+  gunPosition: {fileID: 1881004619}
 --- !u!1 &874395027
 GameObject:
   m_ObjectHideFlags: 0
@@ -2091,7 +2064,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1881004619}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.905, z: -0.371}
+  m_LocalPosition: {x: 0, y: -0.905, z: -0.431}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
