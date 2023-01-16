@@ -54,6 +54,7 @@ public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy
             Debug.LogError("RemoveFromSpawn called without ISpawnable reference");
             return;
         }
+        //move this to OnDestroy 
         --spawn.currentSpawnedEnemies;
         //we've removed ourselves so we must be dead, let's ensure that
         Destroy(gameObject);
@@ -84,5 +85,10 @@ public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy
                 RemoveFromSpawn();
             }
         }
+    }
+
+    void OnDestroy()
+    {
+        //perhaps removing from the spawn count should happen here?
     }
 }

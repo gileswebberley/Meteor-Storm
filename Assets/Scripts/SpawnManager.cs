@@ -92,6 +92,11 @@ public class SpawnManager : SpawnerBase
     public override void RestartSpawn(){
         if(bHasStarted){
             ResetSpawnZ();
+            ISpawnedEnemy[] toClearUp = GameObject.FindObjectsOfType<MeteorBehaviour>();
+            foreach(ISpawnedEnemy o in toClearUp)
+            {
+                o.RemoveFromSpawn();
+            }
         }
         StartSpawn();
     }
@@ -117,7 +122,8 @@ public class SpawnManager : SpawnerBase
         //Check that our enemies implement ISpawnedEnemy with a type check
         foreach(GameObject o in meteorPrefabs){
             //this checks that the GameObject will add/remove itself from the counter
-            if(!o is ISpawnedEnemy)//VSCode says this won't work but it does
+            ISpawnedEnemy test = o.GetComponent<ISpawnedEnemy>();
+            if(test == null)
             {
                 Debug.LogError("ENEMY PREFAB (meteor) IS NOT OF TYPE ISpawnedEnemy - unable to spawn");
                 enemyOk = false;
@@ -126,7 +132,8 @@ public class SpawnManager : SpawnerBase
         }
         foreach(GameObject o in planetPrefabs){
             //this checks that the GameObject will add/remove itself from the counter
-            if(!o is ISpawnedEnemy)//VSCode says this won't work but it does
+            ISpawnedEnemy test = o.GetComponent<ISpawnedEnemy>();
+            if(test == null)
             {
                 Debug.LogError("ENEMY PREFAB (planet) IS NOT OF TYPE ISpawnedEnemy - unable to spawn");
                 enemyOk = false;
