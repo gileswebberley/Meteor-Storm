@@ -594,6 +594,8 @@ MonoBehaviour:
   - {fileID: 3334328664307809406, guid: f90e8a2a0d5408712b318d3df883bd1f, type: 3}
   starPrefabs:
   - {fileID: 6322974711906818595, guid: fc334623ec59263b6a2eb7662b5459fa, type: 3}
+  minSpawnAmount: 5
+  maxSpawnAmount: 10
 --- !u!1 &504731231
 GameObject:
   m_ObjectHideFlags: 0

@@ -89,6 +89,6 @@ public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy
 
     void OnDestroy()
     {
-        //perhaps removing from the spawn count should happen here?
+        //perhaps removing from the spawn count should happen here although it could end up causing an awful loop?
     }
 }

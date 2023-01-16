@@ -15,12 +15,13 @@ public abstract class SpawnerBase : MonoBehaviour, ISpawnable {
         get {return _bHasStarted;}
         protected set {_bHasStarted = value;}
     }
-    protected bool _bIsSpawning = false;
+    private bool _bIsSpawning = false;
     public bool bIsSpawning {
         get {return _bIsSpawning;}
         protected set { _bIsSpawning = value;}
     }
     //[SerializeField] directive makes it available in the Editor Inspector
+    //Doesn't seem to pass down the inheritance chain...:/
     //Minimum amount to spawn in a wave
     [SerializeField] public int minSpawnAmount {get; protected set;} = 5;   
     //Maximum amount to spawn in a wave
