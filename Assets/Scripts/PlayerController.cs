@@ -141,6 +141,7 @@ public class PlayerController : MonoBehaviour
         //yep, so it can hide the text and the indicator
         strengthManager.Disable();
         powerManager.Disable();
+        Time.timeScale = 0;
         playerRB.angularDrag = originalAngularDrag + 20f;
     }
 
@@ -149,6 +150,7 @@ public class PlayerController : MonoBehaviour
     {
         playerRB.MoveRotation(originalRotation);
         playerRB.angularDrag = originalAngularDrag;
+        Time.timeScale = 1;
 
         strengthManager.Enable();
         strengthManager.AddStrengthLevel(aStrength);
@@ -307,7 +309,9 @@ public class PlayerController : MonoBehaviour
 
     void MoveMe(Vector3 target)
     {
-        playerRB.AddTorque(Vector3.forward * -((target.x * speed) / rotationalDamper), ForceMode.Impulse);
+        //going to add some other rotational behaviour options...
+        //playerRB.AddTorque(Vector3.forward * -((target.x * speed) / rotationalDamper), ForceMode.Impulse);
+        playerRB.AddTorque(Vector3.forward * -((target.x) / rotationalDamper), ForceMode.Impulse);
         playerRB.AddForce(target * speed, ForceMode.Impulse);
     }
 
