@@ -311,7 +311,7 @@ public class PlayerController : MonoBehaviour
     {
         //going to add some other rotational behaviour options...
         //playerRB.AddTorque(Vector3.forward * -((target.x * speed) / rotationalDamper), ForceMode.Impulse);
-        playerRB.AddTorque(Vector3.forward * -((target.x) / rotationalDamper), ForceMode.Impulse);
+        playerRB.AddTorque(Vector3.forward * -((target.x*DifficultyManager.difficulty) / rotationalDamper), ForceMode.Impulse);
         playerRB.AddForce(target * speed, ForceMode.Impulse);
     }
 

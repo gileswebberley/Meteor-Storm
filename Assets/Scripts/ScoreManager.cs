@@ -26,8 +26,11 @@ namespace OodModels
 
         public string name {
             get {return _thisScore.name;}
+            //late addition but there doesn't seem any good reason to protect this from setting
+            set {_thisScore.name = value;}
         }
 
+        //only use for positive numbers, a mistaken minus will be passed to remove function
         public void AddToScore(int toAdd)
         {
             if(toAdd < 0){
@@ -36,7 +39,7 @@ namespace OodModels
                 _thisScore.score += toAdd;
             }
         }
-
+        //reverse functionality of AddToScore
         public void RemoveFromScore(int toRemove)
         {
             if(toRemove < 0){

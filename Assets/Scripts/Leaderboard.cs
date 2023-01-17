@@ -7,7 +7,7 @@ namespace OodModels
     public abstract class Leaderboard
     {
         //make the leaderboard itself large and then use leaderboardSize for what we work with? 
-        //Sort() is not working as expected
+        //Fixed - Sort() is not working as expected
         [SerializeField] protected ScoreDataList<ScoreData> leaderboardArray = new ScoreDataList<ScoreData>();
 
         //default constructor
@@ -63,9 +63,8 @@ namespace OodModels
         {
             if (leaderboardArray.list != null)
             {
-                //--------- extract out
                 leaderboardArray.list.Add(newScore);
-                //then sort based on the ScoreData Comparable I hope - doesn't seem to be working
+                //then sort based on the ScoreData Comparable
                 leaderboardArray.list.Sort();
 
                 Debug.Log($"New score (rank): {newScore.name} : {newScore.score} ({leaderboardArray.list.IndexOf(newScore)+1}) added to the {_leaderboardName} leaderboard");
@@ -75,14 +74,13 @@ namespace OodModels
                     //then get rid of the lowest score
                     leaderboardArray.list.RemoveAt(leaderboardArray.list.Count);
                 }
-                //-----------to here
             }else{
                 Debug.LogError("Leaderboard is NULL in AddToLeaderboard()");
             }
         }
 
         protected virtual List<ScoreData> GetLeaderboardRaw(){
-            List<ScoreData> temp = new List<ScoreData>(_leaderboardSize);//use GetRange(0,_leaderboardSize)?
+            List<ScoreData> temp = new List<ScoreData>(_leaderboardSize);
             for(int i = 0; i < _leaderboardSize; i++){
                 //Catch Out Of Bounds exceptions in case the list is shorter than _leaderboardSize
                 try{

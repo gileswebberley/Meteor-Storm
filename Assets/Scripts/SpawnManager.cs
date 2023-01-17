@@ -40,8 +40,8 @@ public class SpawnManager : SpawnerBase
     //we subtract this from GameBounds.minZ to move it in front of the player
     private float spawnZMoveOffset = 100f;
     //Hide these inherited variables so that they appear in the Editor, need to work out why... 
-    [SerializeField] int minSpawnAmount = 5;
-    [SerializeField] int maxSpawnAmount = 10;
+    [SerializeField] int minimumSpawnAmount = 5;
+    [SerializeField] int maximumSpawnAmount = 10;
     
 
     void Start()
@@ -60,6 +60,9 @@ public class SpawnManager : SpawnerBase
         maxSpawnY = GameBounds.maxY;
         minSpawnX = GameBounds.minX;
         minSpawnY = GameBounds.minY;
+        //a workaround to solve the issue with SerializeField not coming down the inheritance chain
+        minSpawnAmount = minimumSpawnAmount;
+        maxSpawnAmount = maximumSpawnAmount;
     }
 
     // Update is called once per frame
