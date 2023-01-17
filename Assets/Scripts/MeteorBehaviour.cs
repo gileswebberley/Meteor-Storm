@@ -74,7 +74,7 @@ public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy
     void OnTriggerEnter(Collider other){
         if(other.CompareTag("LaserShot")){
             //hit by a laser, check how powerful it is
-            power -= player.GetLaserPower();
+            power -= player.Laser.laserPower;//GetLaserPower();
             //remove laser shot that hit
             Destroy(other.gameObject);
             if(power <= 0){

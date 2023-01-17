@@ -24,6 +24,9 @@ public class PlayerController : MonoBehaviour
     //all the speed based properties -------
     //affects control twitchyness, other objects use it to make it feel like speed has changed
     private float speed = 10f;
+    public float Speed{
+        get{return speed;}
+    }
     private float minSpeed = 5f;
     private float maxSpeed = 20f;
 
@@ -54,6 +57,9 @@ public class PlayerController : MonoBehaviour
     private IStrengthManager powerManager;
     //our gun which is enabled by our PowerManager
     private LaserWeapon laser;
+    public LaserWeapon Laser{
+        get{return laser;}
+    }
 
     void Start()
     {
@@ -91,9 +97,8 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         if (!bIsPlaying) return;
-        MoveMe(targetVector);
-        //this comes second as it does bounds checking which uses MoveMe() as well
         UpdateTargetVector();
+        MoveMe(targetVector);
     }
 
     void LateUpdate()
@@ -101,7 +106,7 @@ public class PlayerController : MonoBehaviour
         if (!bIsPlaying) return;
         //this comes second as it does bounds checking which uses MoveMe() as well
         //UpdateTargetVector();
-        CheckForBounds();
+        //CheckForBounds();
     }
 
 
@@ -137,37 +142,37 @@ public class PlayerController : MonoBehaviour
 
     public void DisablePlayer()
     {
+        //the main boolean flag...
         bIsPlaying = false;
         //yep, so it can hide the text and the indicator
         strengthManager.Disable();
         powerManager.Disable();
+        //this makes all of the physics stop so pause the game
         Time.timeScale = 0;
-        playerRB.angularDrag = originalAngularDrag + 20f;
     }
 
     //Reset strength, power, speed, rotation and set bIsPlaying = true;
     public void EnablePlayer(float aStrength, float aPower)
     {
         playerRB.MoveRotation(originalRotation);
-        playerRB.angularDrag = originalAngularDrag;
-        Time.timeScale = 1;
-
+        //reset the strength managers to start value plus aStrength/aPower
         strengthManager.Enable();
+        strengthManager.Reset();
         strengthManager.AddStrengthLevel(aStrength);
+
         powerManager.Enable();
-        //most reliable way - to remove any left over power
-        powerManager.AddDamageLevel(powerManager.strength);
-        //then add the start power
+        powerManager.Reset();
+        //then add to the start power
         powerManager.AddStrengthLevel(aPower);
         speed = minSpeed;
-        // AddPowerLevel(-power);
-        // AddPowerLevel(aPower);
+        //Unpause the physics
+        Time.timeScale = 1;
         bIsPlaying = true;
     }
 
     public void EnablePlayer()
     {
-        EnablePlayer(strengthManager.startStrength, powerManager.startStrength);
+        EnablePlayer(0f, 0f);
     }
 
     // Behaviour when hit by collider with isTrigger = true
@@ -196,15 +201,12 @@ public class PlayerController : MonoBehaviour
     }
     private void FireLaser()
     {
-        //check that we have power to fire
+        //check that we have power to fire and that we're not already firing (rounds per second control)
         if (powerManager.strength > 0 && laser.Fire())
         {
+            //if so take away from our ammunition
             powerManager.AddDamageLevel(powerManager.maxStrength / laser.maxRounds);
         }
-    }
-    public float GetLaserPower()
-    {
-        return laser.laserPower;
     }
 
     //Behaviour when hit by Rigidbody with isTrigger = false in collider
@@ -231,44 +233,6 @@ public class PlayerController : MonoBehaviour
         float damage = speed + otherGO.GetComponent<MoveForwardRb>().speed;
         damage += otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
         return damage;
-    }
-
-    //returns multiplier for targetVector [bInXBounds,bInYBounds,1] and pushes gameObject back into bounds
-    Vector3 CheckForBounds()
-    {
-        Vector3 temp = new Vector3(1, 1, 1);
-        Vector3 tempMoveMe = new Vector3(0, 0, 0);
-        bool isHittingBounds = false;
-        //gonna try to move this to the GameBounds class as a method
-        Vector3 tempTransform = new Vector3(transform.position.x + targetVector.x, transform.position.y + targetVector.y, 1);
-        //gone too wide so push us back into the middle and return [0,y,1] 
-        if (transform.position.x + targetVector.x > GameBounds.maxX)
-        {
-            temp.x = 0;
-            tempMoveMe.x = -1;
-            isHittingBounds = true;
-        }
-        else if (transform.position.x + targetVector.x < GameBounds.minX)
-        {
-            temp.x = 0;
-            tempMoveMe.x = 1;
-            isHittingBounds = true;
-        }
-        //gone too high or low so push us back into the middle and return[x,0,1]
-        if (transform.position.y + targetVector.y > GameBounds.maxY)
-        {
-            temp.y = 0;
-            tempMoveMe.y = -1;
-            isHittingBounds = true;
-        }
-        else if (transform.position.y + targetVector.y < GameBounds.minY)
-        {
-            temp.y = 0;
-            tempMoveMe.y = 1;
-            isHittingBounds = true;
-        }
-        if (isHittingBounds) MoveMe(tempMoveMe);
-        return temp;
     }
 
     //the mouse motion control set up
@@ -298,34 +262,33 @@ public class PlayerController : MonoBehaviour
         //reverse the x-axis
         targetVector.x = -targetVector.x;
         targetVector.z = targetPosition.z - transform.position.z;
-        //multiply by speed so as you go faster the motion gets more twitchy
+        //Let's try a different way - not working....
+        // targetVector = Input.mousePosition;
+        // targetVector.z = Camera.main.nearClipPlane;//targetPosition.z - transform.position.z;
+        // //targetVector = Camera.main.ScreenToWorldPoint(targetVector);
+        // Vector3.Normalize(targetVector);
+        //multiply by speed so as you go faster the motion gets faster
         targetVector *= speed;
-        //check that we aren't going out of bounds and correct appropriately
-        //this is in this method so that MoveMe() could stay pure, it's used in the bounds check
-        //so would loop around pointlessly if moved to MoveMe() - don't do it!
-        // Vector3 boundsCheck = CheckForBounds();
-        // targetVector = Vector3.Scale(targetVector, boundsCheck);
+        //Let's see if this happens to work first time...yeah :)
+        //targetVector is modified in this function, makes it bounce off the bounds
+        GameBounds.Instance.CheckForXYBounds(transform.position, ref targetVector);
     }
 
     void MoveMe(Vector3 target)
     {
-        //going to add some other rotational behaviour options...
-        //playerRB.AddTorque(Vector3.forward * -((target.x * speed) / rotationalDamper), ForceMode.Impulse);
+        //going to add some rotational behaviour...
         playerRB.AddTorque(Vector3.forward * -((target.x*DifficultyManager.difficulty) / rotationalDamper), ForceMode.Impulse);
         playerRB.AddForce(target * speed, ForceMode.Impulse);
     }
 
     //for other game objects to access but not effect
+    //public float GetSpeed(){return speed;}
     //implement as Properties now I've discovered that's how
     //c# deals with encapsulation
-    public float GetSpeed()
-    {
-        return speed;
-    }
 
-    void ChangeSpeed(float n)
+    void ChangeSpeed(float toChangeBy)
     {
-        speed += n;
+        speed += toChangeBy;
         if (speed > maxSpeed) speed = maxSpeed;
         if (speed < minSpeed) speed = minSpeed;
         Debug.Log("Speed is: " + speed);

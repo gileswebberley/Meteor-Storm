@@ -37,7 +37,7 @@ public class MoveForwardRb : MonoBehaviour
 
     protected virtual bool RbAddForwardForce()
     {  
-        speedWithinEnvironment = speed+player.GetSpeed();
+        speedWithinEnvironment = speed+player.Speed;
         //This is how to get a continuous force that's just like the Translate behaviour
         thisRB.AddForce(Vector3.forward*speedWithinEnvironment,ForceMode.Force);
         //check that we are still in view (within z-bounds)

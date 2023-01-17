@@ -186,5 +186,44 @@ namespace OodModels
                 }
             }
         }
+
+        //Trying to use ref for the first time, I tried using out and was warned about properties may not exist
+        //moving the functionality in here where it belongs, rather than part of the PlayerController
+        public bool CheckForXYBounds(Vector3 comparePosition, ref Vector3 targetVector)
+    {
+        // Vector3 temp = new Vector3(1, 1, 1);
+        // Vector3 tempMoveMe = new Vector3(0, 0, 0);
+        bool isHittingBounds = false;
+        //gonna try to move this to the GameBounds class as a method
+        //Vector3 tempTransform = new Vector3(transform.position.x + targetVector.x, transform.position.y + targetVector.y, 1);
+        //gone too wide so push us back into the middle and return [0,y,1] 
+        if (comparePosition.x + targetVector.x > GameBounds.maxX)
+        {
+            // temp.x = 0;
+            targetVector.x = -1;
+            isHittingBounds = true;
+        }
+        else if (comparePosition.x + targetVector.x < GameBounds.minX)
+        {
+            // temp.x = 0;
+            targetVector.x = 1;
+            isHittingBounds = true;
+        }
+        //gone too high or low so push us back into the middle and return[x,0,1]
+        if (comparePosition.y + targetVector.y > GameBounds.maxY)
+        {
+            // temp.y = 0;
+            targetVector.y = -1;
+            isHittingBounds = true;
+        }
+        else if (comparePosition.y + targetVector.y < GameBounds.minY)
+        {
+            //temp.y = 0;
+            targetVector.y = 1;
+            isHittingBounds = true;
+        }
+        //if (isHittingBounds) MoveMe(tempMoveMe);
+        return isHittingBounds;
+    }
     }
 }
