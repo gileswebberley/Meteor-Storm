@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
     private GameObject gameOverUI;
     //private int score = 0;
     //score replaced by a score manager which the game manager has access to
-    private ScoreManager scorer;
+    private ScoreManagerUI scorer;
 
     //time to test out a leaderboard
     private FileLeaderboard leaderboard;
@@ -46,7 +46,8 @@ public class GameManager : MonoBehaviour
     {
         UpdateScore(0);
         //gameOverUI.SetActive(false);
-        scoreText.gameObject.SetActive(false);
+        scorer.Hide();
+        //scoreText.gameObject.SetActive(false);
         StartGame();
     }
     //This runs before the Start() method, use to instantiate objects of a class
@@ -106,9 +107,10 @@ public class GameManager : MonoBehaviour
         //pass on the name of the resource to the new GameObject
         gameOverUI.name = "Game Over Page";
         //No script component to grab in here but we will look for buttons
-        //gameOverUI = transform.Find("Game Over Page").gameObject;
         Button restartButton = gameOverUI.transform.Find("Restart").GetComponent<Button>();
         restartButton.onClick.AddListener(RestartGame);
+        Button quitButton = gameOverUI.transform.Find("Quit").GetComponent<Button>();
+        quitButton.onClick.AddListener(QuitGame);
         //seems to work very nicely
         if (gameOverUI == null)
         {
@@ -118,8 +120,13 @@ public class GameManager : MonoBehaviour
 
     public void SetUpScoring(string scoreName, string leaderboardName)
     {
-        //Try using score manager....
-        scorer = new ScoreManager();
+        //Try using score manager....experimenting with ScriptableObjects...
+        //scorer = new ScoreManagerUI();
+        scorer = ScriptableObject.CreateInstance("ScoreManagerUI") as ScoreManagerUI;
+        //can't get it to find the text area so just going to have to pass it for now
+        //scorer.SetScoreTextArea(scoreText);
+        //ah, no, it seems to have worked now that it is the child of a ScriptableObject
+        scorer.CreateScoreTextArea("Score Text");
         scorer.name = scoreName;
         //and now a leaderboard...
         leaderboard = new FileLeaderboard(leaderboardName);
@@ -143,17 +150,19 @@ public class GameManager : MonoBehaviour
         DifficultyManager.mono = this;
     }
 
+    //UI moved to ScoreManagerUI so it looks after itself
     public void UpdateScore(int toAdd)
     {
         scorer.AddToScore(toAdd);
         //using c# "string interpolation" by using the $ before the string values can be 
         //put directly into the string without concatenation by placing them in {}
-        scoreText.text = $"{scorer.name} score:{scorer.score}";//+score;
+        //scoreText.text = $"{scorer.name} score:{scorer.score}";//+score;
     }
 
     public void GameOver()
     {
-        //leave the score visible
+        //leave the score visible - no - replaced with ranking message below
+        scorer.Hide();
         gameOver = true;
         //Grabs the asset from Resources folder and attaches event handlers to the button(s)
         CreateGameOver();
@@ -163,6 +172,11 @@ public class GameManager : MonoBehaviour
         DifficultyManager.Instance.StopDifficultyStepTimer();
         //adding to the leaderboard
         leaderboard.AddToLeaderboard(scorer.data);
+        //now find how this score ranked and write a message if it made it onto the leaderboard
+        int ranking = leaderboard.GetLeaderboardRanking(scorer.data);
+        if(ranking != 0){
+            gameOverUI.transform.Find("Score Ranking").GetComponent<TextMeshProUGUI>().text = $"{scorer.name} your score of {scorer.score} ranks you #{ranking}";
+        }
     }
 
     public void StartGame()
@@ -170,12 +184,13 @@ public class GameManager : MonoBehaviour
         leaderboard.LoadLeaderboard();
         gameOver = false;
         //gameOverUI.SetActive(false);
-        scoreText.gameObject.SetActive(true);
+        scorer.Show();
+        //scoreText.gameObject.SetActive(true);
         DifficultyManager.Instance.SetDifficulty(1);
         //make an auto difficulty change happen every difficultyChangeTime(seconds)
         DifficultyManager.Instance.StartDifficultyStepTimer(difficultyChangeTime);
         
-        //just for testing as something is awry
+        //just for testing as something was awry
         List<ScoreData> lb = leaderboard.GetLeaderboard();
         foreach(ScoreData s in lb)
         {
@@ -195,5 +210,16 @@ public class GameManager : MonoBehaviour
         Destroy(gameOverUI);
         //and (re)start the game...
         StartGame();
+    }
+
+    public void QuitGame()
+    {
+        leaderboard.SaveLeaderboard();
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+            //UnityEditor.EditorApplication.Exit(0);
+        #else
+            Application.Quit();
+        #endif
     }
 }

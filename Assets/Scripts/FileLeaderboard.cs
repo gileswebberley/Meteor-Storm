@@ -90,10 +90,10 @@ namespace OodModels
             //return true;
         }
 
-        public List<ScoreData> GetLeaderboard()
+        public override List<ScoreData> GetLeaderboard()
         {
             LoadLeaderboard();
-            return GetLeaderboardRaw();
+            return base.GetLeaderboard();
         }
     }
 }

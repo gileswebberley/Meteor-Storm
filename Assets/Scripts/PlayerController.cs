@@ -262,13 +262,13 @@ public class PlayerController : MonoBehaviour
         //reverse the x-axis
         targetVector.x = -targetVector.x;
         targetVector.z = targetPosition.z - transform.position.z;
+        //multiply by speed so as you go faster the motion gets faster
+        targetVector *= speed;
         //Let's try a different way - not working....
         // targetVector = Input.mousePosition;
         // targetVector.z = Camera.main.nearClipPlane;//targetPosition.z - transform.position.z;
         // //targetVector = Camera.main.ScreenToWorldPoint(targetVector);
         // Vector3.Normalize(targetVector);
-        //multiply by speed so as you go faster the motion gets faster
-        targetVector *= speed;
         //Let's see if this happens to work first time...yeah :)
         //targetVector is modified in this function, makes it bounce off the bounds
         GameBounds.Instance.CheckForXYBounds(transform.position, ref targetVector);

@@ -79,7 +79,21 @@ namespace OodModels
             }
         }
 
-        protected virtual List<ScoreData> GetLeaderboardRaw(){
+        public virtual int GetLeaderboardRanking(ScoreData theScore)
+        {
+            int ranking;
+            //IndexOf returns -1 if the entry is not found, so it will return zero if not on the leaderboard
+            ranking = leaderboardArray.list.IndexOf(theScore)+1;
+            if(ranking > _leaderboardSize) ranking = 0;
+            if(ranking > 0){
+                Debug.Log($"New score (rank): {theScore.name} : {theScore.score} ({ranking}) added to the {_leaderboardName} leaderboard");
+            }else{
+                Debug.Log($"Unfortunately {theScore.name} you didn't make it onto the {_leaderboardName} leaderboard this time");
+            }
+            return ranking;
+        }
+
+        public virtual List<ScoreData> GetLeaderboard(){
             List<ScoreData> temp = new List<ScoreData>(_leaderboardSize);
             for(int i = 0; i < _leaderboardSize; i++){
                 //Catch Out Of Bounds exceptions in case the list is shorter than _leaderboardSize

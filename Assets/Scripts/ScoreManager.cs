@@ -1,8 +1,10 @@
 using System;
+using UnityEngine;
 
 namespace OodModels
 {
-    public class ScoreManager
+    //as I extended this to be ScoreManagerUI I had trouble with using the new keyword so try making it an SO
+    public class ScoreManager : ScriptableObject
     {
         //I was about to make this a singleton but there's some doubt about whether that's appropriate
         //if I did then I wouldn't be able to use several instances in a, let's call it, MultiScoreManager
@@ -24,14 +26,15 @@ namespace OodModels
             get{return _thisScore.score;}
         }
 
-        public string name {
+        //new keyword used as it is hiding Object.name
+        public new string name {
             get {return _thisScore.name;}
             //late addition but there doesn't seem any good reason to protect this from setting
             set {_thisScore.name = value;}
         }
 
         //only use for positive numbers, a mistaken minus will be passed to remove function
-        public void AddToScore(int toAdd)
+        public virtual void AddToScore(int toAdd)
         {
             if(toAdd < 0){
                 RemoveFromScore(toAdd*-1);
@@ -40,7 +43,7 @@ namespace OodModels
             }
         }
         //reverse functionality of AddToScore
-        public void RemoveFromScore(int toRemove)
+        public virtual void RemoveFromScore(int toRemove)
         {
             if(toRemove < 0){
                 AddToScore(toRemove*-1);
@@ -49,7 +52,7 @@ namespace OodModels
             }
         }
 
-        public void ResetScore()
+        public virtual void ResetScore()
         {
             _thisScore.score = 0;
         }
