@@ -81,7 +81,7 @@ public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy
                 //can't get the particle system to work :( ++ There we go, simply use Instantiate rather than try to play it
                 Instantiate(explodePS,transform.position, transform.rotation);
                 //add my original power to the player score
-                gameHQ.UpdateScore(((int)startPower));//warning casting to int
+                ScoringSystem.Instance.Scorer.AddToScore((int)startPower);//warning casting to int
                 RemoveFromSpawn();
             }
         }

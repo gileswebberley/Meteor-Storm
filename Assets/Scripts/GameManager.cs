@@ -1,10 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//add TMPro include to access our text mesh pro game object
+//add TMPro include to access our text mesh pro game objects
 using TMPro;
 //need access to buttons so that we can setup the event on them
 using UnityEngine.UI;
+//for checking which scene we're in
+using UnityEngine.SceneManagement;
 //to set GameBounds for bounds checking across the application
 using OodModels;
 //for ISpawnable
@@ -23,8 +26,8 @@ public class GameManager : MonoBehaviour
 
     //How long to wait before upping the difficulty, default 1 minute
     [SerializeField] private int difficultyChangeTime = 60;
-    //This is why we've added the TMPro library
-    [SerializeField] private TextMeshProUGUI scoreText;
+
+    [SerializeField] private string[] gameSceneName;
 
     //A Game USES-A (Aggregation?) spawn, score, difficulty (and leaderboard)
     //but must surely HAVE_A (Composition?) player?
@@ -35,46 +38,44 @@ public class GameManager : MonoBehaviour
     //Game Over page with restart button
     private GameObject gameOverUI;
     //private int score = 0;
-    //score replaced by a score manager which the game manager has access to
-    private ScoreManagerUI scorer;
-
-    //time to test out a leaderboard
-    private FileLeaderboard leaderboard;
-
-
-    void Start()
-    {
-        UpdateScore(0);
-        //gameOverUI.SetActive(false);
-        scorer.Hide();
-        //scoreText.gameObject.SetActive(false);
-        StartGame();
-    }
+   
     //This runs before the Start() method, use to instantiate objects of a class
     void Awake()
     {
         //make sure there's only one otherwise it's not much of a singleton
-        if (Instance != null)
+        if (_instance != null)
         {
             //this is not the first instance of MainManager so our singleton already exists
             Destroy(gameObject);
         }
-        Instance = this;
+        _instance = this;
         //to make persistant between scenes
         DontDestroyOnLoad(gameObject);
         
-        SetUpGameBounds();
-        SetUpDifficulty();
-        SetUpScoring("Giles","MeteorStorm");
-        CreatePlayer();
-        CreateSpawner();
+        //check the array of scene names that we should be managing as game play scenes
+        if (Array.Exists(gameSceneName,element => element == SceneManager.GetActiveScene().name))
+        {
+            Debug.Log("We have entered a game play scene so game manager is setting up the components");
+            //Now these are used to setup the game...
+            SetUpGameBounds();
+            SetUpDifficulty();
+            ScoringSystem.Instance.Scorer.AddToScore(0);
+            //gameOverUI.SetActive(false);
+            //ScoringSystem.Instance.Scorer.Hide();
+            if(ScoringSystem.Instance.Leaderboard == null) ScoringSystem.Instance.SetupLeaderboard(SceneManager.GetActiveScene().name);
+            CreatePlayer();
+            CreateSpawner();
+            StartGame();
+        }
     }
 
     public void CreatePlayer()
     {
+        if(player != null) return;
         //Instead of finding the player we'll just load the prefab from Resources folder
         //this way we control when we want it and so don't get all the Null Reference Exceptions
-        GameObject playerGO = Object.Instantiate(Resources.Load("Player")) as GameObject;
+        //explicit because System has Object as well, I'm using that for the Array.Exists()
+        GameObject playerGO = UnityEngine.Object.Instantiate(Resources.Load("Player")) as GameObject;
         //set the name so that the MoveForwardRb can still find the speed
         playerGO.name = "Player";
         player = playerGO.GetComponent<PlayerController>();
@@ -86,10 +87,9 @@ public class GameManager : MonoBehaviour
 
     public void CreateSpawner()
     {
-        //spawn = GameObject.Find("Spawn Manager").GetComponent<SpawnManager>();
-        
+        if(spawn != null) return;
         //same for spawner
-        GameObject spawnGO = Object.Instantiate(Resources.Load("Spawn Manager")) as GameObject;
+        GameObject spawnGO = UnityEngine.Object.Instantiate(Resources.Load("Spawn Manager")) as GameObject;
         spawnGO.name = "Spawn Manager";
         spawn = spawnGO.GetComponent<ISpawnable>();
         if (spawn == null)
@@ -103,7 +103,7 @@ public class GameManager : MonoBehaviour
         //Build the game over page from a prefab in Resources folder, like Player and SpawnManager
         //I'm doing this as I want to use GameManager to create several scenes (just for experimentation) and want to avoid all
         //of the Null Pointer exceptions that you get when you try to use a singleton in Unity it seems?
-        gameOverUI = Object.Instantiate(Resources.Load("Game Over Page")) as GameObject;
+        gameOverUI = UnityEngine.Object.Instantiate(Resources.Load("Game Over Page")) as GameObject;
         //pass on the name of the resource to the new GameObject
         gameOverUI.name = "Game Over Page";
         //No script component to grab in here but we will look for buttons
@@ -118,19 +118,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void SetUpScoring(string scoreName, string leaderboardName)
-    {
-        //Try using score manager....experimenting with ScriptableObjects...
-        //scorer = new ScoreManagerUI();
-        scorer = ScriptableObject.CreateInstance("ScoreManagerUI") as ScoreManagerUI;
-        //can't get it to find the text area so just going to have to pass it for now
-        //scorer.SetScoreTextArea(scoreText);
-        //ah, no, it seems to have worked now that it is the child of a ScriptableObject
-        scorer.CreateScoreTextArea("Score Text");
-        scorer.name = scoreName;
-        //and now a leaderboard...
-        leaderboard = new FileLeaderboard(leaderboardName);
-    }
 
     public void SetUpGameBounds()
     {
@@ -147,22 +134,24 @@ public class GameManager : MonoBehaviour
         DifficultyManager.maxDifficulty = 5;
         DifficultyManager.difficulty = 1;
         //pass this MonoBehaviour object to run co-routines (for the timer)
-        DifficultyManager.mono = this;
+        DifficultyManager.mono = this as MonoBehaviour;
     }
 
     //UI moved to ScoreManagerUI so it looks after itself
-    public void UpdateScore(int toAdd)
-    {
-        scorer.AddToScore(toAdd);
-        //using c# "string interpolation" by using the $ before the string values can be 
-        //put directly into the string without concatenation by placing them in {}
-        //scoreText.text = $"{scorer.name} score:{scorer.score}";//+score;
-    }
+    // [Deprecated]
+    // public void UpdateScore(int toAdd)
+    // {
+    //     scorer.AddToScore(toAdd);
+    //     //using c# "string interpolation" by using the $ before the string values can be 
+    //     //put directly into the string without concatenation by placing them in {}
+    //     //scoreText.text = $"{scorer.name} score:{scorer.score}";//+score;
+    // }
 
     public void GameOver()
     {
+        Debug.Log("GAME OVER has been called on Game Manager");
         //leave the score visible - no - replaced with ranking message below
-        scorer.Hide();
+        ScoringSystem.Instance.Scorer.Hide();
         gameOver = true;
         //Grabs the asset from Resources folder and attaches event handlers to the button(s)
         CreateGameOver();
@@ -171,55 +160,62 @@ public class GameManager : MonoBehaviour
         player.DisablePlayer();
         DifficultyManager.Instance.StopDifficultyStepTimer();
         //adding to the leaderboard
-        leaderboard.AddToLeaderboard(scorer.data);
+        ScoringSystem.Instance.Leaderboard.AddToLeaderboard(ScoringSystem.Instance.Scorer.data);
         //now find how this score ranked and write a message if it made it onto the leaderboard
-        int ranking = leaderboard.GetLeaderboardRanking(scorer.data);
-        if(ranking != 0){
-            gameOverUI.transform.Find("Score Ranking").GetComponent<TextMeshProUGUI>().text = $"{scorer.name} your score of {scorer.score} ranks you #{ranking}";
+        int ranking = ScoringSystem.Instance.Leaderboard.GetLeaderboardRanking(ScoringSystem.Instance.Scorer.data);
+        if (ranking != 0)
+        {
+            gameOverUI.transform.Find("Score Ranking").GetComponent<TextMeshProUGUI>().text = $"{ScoringSystem.Instance.Scorer.name} your score of {ScoringSystem.Instance.Scorer.score} ranks you #{ranking}";
+        }
+        else
+        {
+            gameOverUI.transform.Find("Score Ranking").GetComponent<TextMeshProUGUI>().text = $"Sorry {ScoringSystem.Instance.Scorer.name} but you didn't make it onto the leaderboard this time";
         }
     }
 
     public void StartGame()
     {
-        leaderboard.LoadLeaderboard();
+        //ScoringSystem.Instance.Leaderboard.LoadLeaderboard(); - I have made this part of the constructor
         gameOver = false;
-        //gameOverUI.SetActive(false);
-        scorer.Show();
+        ScoringSystem.Instance.Scorer.Show();
         //scoreText.gameObject.SetActive(true);
-        DifficultyManager.Instance.SetDifficulty(1);
+        //DifficultyManager.Instance.SetDifficulty(1);
         //make an auto difficulty change happen every difficultyChangeTime(seconds)
-        DifficultyManager.Instance.StartDifficultyStepTimer(difficultyChangeTime);
-        
+        //if set to zero the artist does not want to use this functionality
+        if(difficultyChangeTime != 0) DifficultyManager.Instance.StartDifficultyStepTimer(difficultyChangeTime);
+
         //just for testing as something was awry
-        List<ScoreData> lb = leaderboard.GetLeaderboard();
-        foreach(ScoreData s in lb)
-        {
-            Debug.Log($"Score {lb.IndexOf(s)}: {s.name} : {s.score}");
-        }
+        // List<ScoreData> lb = ScoringSystem.Instance.Leaderboard.GetLeaderboard();
+        // foreach (ScoreData s in lb)
+        // {
+        //     Debug.Log($"Score {lb.IndexOf(s)}: {s.name} : {s.score}");
+        // }
         player.EnablePlayer();
         spawn.RestartSpawn();
     }
 
+    //function attached to the restart button
     public void RestartGame()
-    {//function attached to the restart button
+    {
         //We don't need to set this in StartGame() as it is initialised with a value of 0
-        scorer.ResetScore();
-        //then update the score UI
-        UpdateScore(scorer.score);
-        
+        ScoringSystem.Instance.Scorer.ResetScore();
+        //then update the score UI - no need any more as the UI has moved into ScoreManagerUI
+        //UpdateScore(scorer.score);
+        //trying to fix the bugs that have appeared, getting an error about _mono so redoing the setup
+        SetUpDifficulty();
         Destroy(gameOverUI);
         //and (re)start the game...
         StartGame();
     }
 
+    //Quit function that works in both Editor and application attached to Quit button
     public void QuitGame()
     {
-        leaderboard.SaveLeaderboard();
-        #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-            //UnityEditor.EditorApplication.Exit(0);
-        #else
+        //leaderboard.SaveLeaderboard();
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
             Application.Quit();
-        #endif
+#endif
     }
 }

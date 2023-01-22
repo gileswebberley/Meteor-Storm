@@ -9,12 +9,14 @@ namespace OodModels
     public class DifficultyManager
     {
         //Create the private singleton instance - can't new MonoBehaviour() hence the _mono solution
-        private static readonly DifficultyManager _instance = new DifficultyManager();
+        private static DifficultyManager _instance; 
         // //Property to encapsulate the _instance
         // //only needed to access non-static members
         public static DifficultyManager Instance
         {
-            get { return _instance; }
+            get {if(_instance != null) return _instance;
+                else _instance = new DifficultyManager();
+                return _instance; }
         }
         // //Private constructor
         private DifficultyManager() { }
@@ -23,20 +25,22 @@ namespace OodModels
         //decided that for just this functionality it wasn't worth inheriting
         private static MonoBehaviour _mono = null;
         public static MonoBehaviour mono {
+            //we just want to be able to use it for ourselves so protected access
             protected get {return _mono;}
+            //but we want any MonoBehaviour to be able to set itself for us to use
             set {_mono = value;}
         }
         private static int _maxDifficulty = 5;
         public static int maxDifficulty
         {
             get { return _maxDifficulty; }
-            set { _instance.SetMaxDifficulty(value); }
+            set { Instance.SetMaxDifficulty(value); }
         }
         private static int _difficulty = 1;
         public static int difficulty
         {
             get { return _difficulty; }
-            set { _instance.SetDifficulty(value); }
+            set { Instance.SetDifficulty(value); }
         }
 
         private float difficultyChangeTime;
@@ -56,7 +60,7 @@ namespace OodModels
         public void StopDifficultyStepTimer()
         {
             if(_mono != null){
-            _mono.StopCoroutine(DifficultyChangeTimer());
+                _mono.StopCoroutine(DifficultyChangeTimer());
             }else{
                 Debug.LogError("DifficultyManager._mono is null");
             }

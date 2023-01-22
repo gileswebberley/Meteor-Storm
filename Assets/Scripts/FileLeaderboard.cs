@@ -7,9 +7,10 @@ namespace OodModels
     public class FileLeaderboard : Leaderboard
     {
         public FileLeaderboard(string name){
-            _leaderboardName = name;
-            //LoadLeaderboard();
+            //if it's already loaded the same one then don't bother - is this correct?
+            if(name != _leaderboardName) LoadLeaderboard(name);            
         }
+
         public override void AddToLeaderboard(string name, int score)
         {
             ScoreData newScore = new ScoreData(name, score);

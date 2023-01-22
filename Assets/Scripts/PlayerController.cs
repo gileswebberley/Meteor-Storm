@@ -13,11 +13,8 @@ using GilesManagers;
 
 public class PlayerController : MonoBehaviour
 {
-    //Implement damage/strength - See StrengthManager
-
     //very important boolean - possible for IPlayable me thinks
     private bool bIsPlaying = false;
-    private GameManager gameHQ;
 
     //Movement related control system
     private Rigidbody playerRB;
@@ -70,8 +67,8 @@ public class PlayerController : MonoBehaviour
     //Use Awake to get all your references (instantiate objects) to avoid the dreaded NullReferenceExeption
     void Awake()
     {
-        //connect with game manager
-        gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
+        //connect with game manager - no need just use the Instance for GameOver()
+        //gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
         //grab the strength manager which uses a slider as it's UI
         strengthManager = GetComponent<StrengthManager>();
         //and the power manager (which is also a StrengthManagerBase with different UI behaviour)
@@ -192,12 +189,6 @@ public class PlayerController : MonoBehaviour
             strengthManager.AddStrengthLevel(strengthManager.maxStrength / 10f);
             Destroy(other.gameObject);
         }
-        else if (other.CompareTag("Star"))
-        {
-            //death by a star, damage is based on mass in rigidbody
-            GameObject otherGO = other.gameObject;
-            if (!strengthManager.AddDamageLevel(CalculateRbDamage(otherGO))) gameHQ.GameOver();
-        }
     }
     private void FireLaser()
     {
@@ -216,12 +207,12 @@ public class PlayerController : MonoBehaviour
         if (!bIsPlaying) return;
         // Non collider collision behaviour here
         // These collisions cause damage based on the mass of other
-        if (other.gameObject.CompareTag("Planet") || other.gameObject.CompareTag("Meteor"))
+        if (other.gameObject.CompareTag("Planet") || other.gameObject.CompareTag("Meteor") || other.gameObject.CompareTag("Star"))
         {
             // You've bumped into a planet
             GameObject otherGO = other.gameObject;
             //if AddDamageLevel makes strength below zero it returns false, so then call GameOver()
-            if (!strengthManager.AddDamageLevel(CalculateRbDamage(otherGO))) gameHQ.GameOver();
+            if (!strengthManager.AddDamageLevel(CalculateRbDamage(otherGO))) GameManager.Instance.GameOver();
         }
     }
 

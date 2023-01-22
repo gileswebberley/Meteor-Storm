@@ -5,32 +5,35 @@ namespace OodModels
 {
     public class ScoreManagerUI : ScoreManager
     {
-        //ScoreManager _scorer = new ScoreManager();
         [SerializeField] TextMeshProUGUI textUI;
         //this doesn't work as expected, perhaps because I am making it with the new keyword??
         public bool CreateScoreTextArea(string textAreaName)
         {
+            try{
             textUI = GameObject.Find(textAreaName).GetComponent<TextMeshProUGUI>();
-            if(textUI == null){
-                Debug.Log("Cannot find the score text area named: "+textAreaName);
+            Debug.Log("Found score text area");
+            return true;
+            }
+            catch{
+                Debug.LogError("Cannot find the score text area named: "+textAreaName);
                 return false;
             }
-            else return true;
         }
 
         public void SetScoreTextArea(TextMeshProUGUI textArea)
         {
-            textUI = textArea;
+            if(textUI != null) textUI = textArea;
         }
 
         public void Show()
         {
-            textUI.gameObject.SetActive(true);
+            if(textUI != null) textUI.gameObject.SetActive(true);
+            UpdateScoreUI();
         }
 
         public void Hide()
         {
-            textUI.gameObject.SetActive(false);
+            if(textUI != null) textUI.gameObject.SetActive(false);
         }
 
         public override void AddToScore(int toAdd)
@@ -53,7 +56,7 @@ namespace OodModels
 
         void UpdateScoreUI()
         {
-            textUI.text = $"{_thisScore.name} score:{_thisScore.score}";
+            if(textUI != null) textUI.text = $"{_thisScore.name} score:{_thisScore.score}";
         }
     }
 }
