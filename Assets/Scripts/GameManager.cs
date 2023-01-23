@@ -71,6 +71,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.P)) PauseGame();
+    }
+
     public void CreatePlayer()
     {
         if(player != null) return;
@@ -113,7 +118,7 @@ public class GameManager : MonoBehaviour
         Button restartButton = gameOverUI.transform.Find("Restart").GetComponent<Button>();
         restartButton.onClick.AddListener(RestartGame);
         Button quitButton = gameOverUI.transform.Find("Quit").GetComponent<Button>();
-        quitButton.onClick.AddListener(SceneDirector.QuitGame);
+        quitButton.onClick.AddListener(SceneDirector.GoToStart);
         //seems to work very nicely
         if (gameOverUI == null)
         {
@@ -137,7 +142,7 @@ public class GameManager : MonoBehaviour
         DifficultyManager.maxDifficulty = 5;
         DifficultyManager.difficulty = 1;
         //pass this MonoBehaviour object to run co-routines (for the timer)
-        DifficultyManager.mono = this as MonoBehaviour;
+        DifficultyManager.Instance.mono = this as MonoBehaviour;
     }
 
     //UI moved to ScoreManagerUI so it looks after itself
@@ -186,6 +191,13 @@ public class GameManager : MonoBehaviour
         if(difficultyChangeTime != 0) DifficultyManager.Instance.StartDifficultyStepTimer(difficultyChangeTime);
         player.EnablePlayer();
         spawn.RestartSpawn();
+    }
+
+    //very basic pause function
+    public void PauseGame()
+    {
+        //simply switch from current state to other state
+        Time.timeScale = (Time.timeScale == 0)? 1 : 0;
     }
 
     //function attached to the restart button

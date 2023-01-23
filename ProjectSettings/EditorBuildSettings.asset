@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Leaderboard.unity
     guid: 1ce0f3e3de3c9874685d7a913f133349
   - enabled: 1
+    path: Assets/Scenes/Instructions.unity
+    guid: a59f311547b07994fa534fbfa3701435
+  - enabled: 1
     path: Assets/Scenes/MeteorStorm.unity
     guid: 4226d152823f4a54ca77d3e46849be27
   m_configObjects: {}

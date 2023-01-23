@@ -67,7 +67,7 @@ public class ScoringSystem : MonoBehaviour
 
     public void PrintLeaderboard(TextMeshProUGUI textArea)
     {
-        textArea.alignment = TextAlignmentOptions.TopJustified;
+        textArea.alignment = TextAlignmentOptions.Center;
         textArea.text = "LEADERBOARD\n\nRank : Name : Score\n";
         List<ScoreData> lb = leaderboard.GetLeaderboard();
         foreach (ScoreData s in lb)

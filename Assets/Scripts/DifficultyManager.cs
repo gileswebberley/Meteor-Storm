@@ -24,8 +24,8 @@ namespace OodModels
         //introducing a monobehaviour object reference to run coroutines
         //decided that for just this functionality it wasn't worth inheriting
         //and also trying to learn how to work with C# so good experimentation
-        private static MonoBehaviour _mono;
-        public static MonoBehaviour mono {
+        private MonoBehaviour _mono;
+        public MonoBehaviour mono {
             //we just want to be able to use it for ourselves so protected access
             protected get {return _mono;}
             //but we want any MonoBehaviour to be able to set itself for us to use

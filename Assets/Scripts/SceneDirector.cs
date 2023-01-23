@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 using TMPro;
 
 public class SceneDirector : MonoBehaviour
-{  
+{ 
     void Awake()
     {
         //I want the leaderboard to print out so this is a kinda OnLoad() for the Leaderboard scene
@@ -19,9 +19,19 @@ public class SceneDirector : MonoBehaviour
         Debug.Log($"Sign up with the name {inputScoreName.text}");
         if(inputScoreName.text == "") return;//so it will create a guest score
         ScoringSystem.Instance.SetUpScoringName(inputScoreName.text);
+        //can't have two properties in the editor it seems so doing this seperately
         //LoadSceneByButtonName(caller);
     }
 
+    public static void GoToStart()
+    {
+        SceneManager.LoadScene("Welcome");
+    }
+
+    public static void LoadSceneByName(string nameStr)
+    {
+        SceneManager.LoadScene(nameStr);
+    }
     public void LoadSceneByButtonName(GameObject caller)
     {
         Debug.Log($"Load scene named {caller.name}");
