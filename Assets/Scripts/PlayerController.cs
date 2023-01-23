@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-//for the GameBounds singleton
+//bits that I'm trying
 using OodModels;
 using IModels;
 using GilesManagers;
@@ -126,7 +126,7 @@ public class PlayerController : MonoBehaviour
         }
         //Mouse button input...
         if (Input.GetMouseButtonDown(0))
-        {//maybe these should be left and right mouse buttons
+        {
             // LEFT BUTTON for rotational correction boosters on the left side of ship (rotates clockwise)
             playerRB.AddTorque(Vector3.forward * rotationalBoosters * speed, ForceMode.Impulse);
         }
@@ -139,7 +139,7 @@ public class PlayerController : MonoBehaviour
 
     public void DisablePlayer()
     {
-        //the main boolean flag...
+        //the main boolean flag to false
         bIsPlaying = false;
         //yep, so it can hide the text and the indicator
         strengthManager.Disable();
@@ -151,7 +151,8 @@ public class PlayerController : MonoBehaviour
     //Reset strength, power, speed, rotation and set bIsPlaying = true;
     public void EnablePlayer(float aStrength, float aPower)
     {
-        playerRB.MoveRotation(originalRotation);
+        transform.rotation = originalRotation;
+        //playerRB.MoveRotation(originalRotation);
         //reset the strength managers to start value plus aStrength/aPower
         strengthManager.Enable();
         strengthManager.Reset();

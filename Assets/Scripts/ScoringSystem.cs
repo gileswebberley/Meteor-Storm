@@ -16,7 +16,7 @@ in the end? - no, I might want it across levels?)
 */
 public class ScoringSystem : MonoBehaviour
 {
-    //hold the singleton object reference
+    //hold the singleton object reference all the work is done in Awake()
     private static ScoringSystem _instance;
     public static ScoringSystem Instance 
     {
@@ -29,26 +29,19 @@ public class ScoringSystem : MonoBehaviour
     [SerializeField, Tooltip("Create a TMPro text area and place in your scene (ensure it is Enabled) - Enter the name of the object here")]
     private string scoreTMPName = "Score Text";
     //score replaced by a score manager which the game manager has access to
-    private ScoreManagerUI scorer;
+    private static ScoreManagerUI scorer;
     public ScoreManagerUI Scorer
     {
         get { return scorer; }
-        protected set {scorer = value;}
+        //protected set {scorer = value;}
     }
 
     //time to test out a leaderboard
-    private FileLeaderboard leaderboard;
+    private static FileLeaderboard leaderboard;
     public FileLeaderboard Leaderboard
     {
         get{return leaderboard;}
-        protected set {leaderboard = value;}
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {        
-        //now we search the scene that's just loaded to see if we can find an appropriately named text area
-        //scorer.CreateScoreTextArea(scoreTMPName);
+        //protected set {leaderboard = value;}
     }
 
     //as far as I understand this will run when a new scene is loaded whereas Start will not?
@@ -69,23 +62,30 @@ public class ScoringSystem : MonoBehaviour
         if(scorer == null) scorer = ScriptableObject.CreateInstance("ScoreManagerUI") as ScoreManagerUI;
         // //now we search the scene that's just loaded to see if we can find an appropriately named text area
         scorer.CreateScoreTextArea(scoreTMPName);
+        SetupLeaderboard("MeteorStorm");
     }
 
-    // Update is called once per frame
-    void Update()
+    public void PrintLeaderboard(TextMeshProUGUI textArea)
     {
-        
+        textArea.alignment = TextAlignmentOptions.TopJustified;
+        textArea.text = "LEADERBOARD\n\nRank : Name : Score\n";
+        List<ScoreData> lb = leaderboard.GetLeaderboard();
+        foreach (ScoreData s in lb)
+        {
+            textArea.text += $"{lb.IndexOf(s)+1} : {s.name} : {s.score}\n";
+            //Debug.Log($"Score {lb.IndexOf(s)}: {s.name} : {s.score}");
+        }
     }
-
-
     public void SetupLeaderboard(string leaderboardName)
-    {     
+    {
+        if(leaderboard != null) return;     
         //if the leaderboardName is already loaded it 
         leaderboard = new FileLeaderboard(leaderboardName);
     }
 
     public void SetUpScoringName(string scoreName)
-    {       
+    {   
+        Debug.Log($"Setting score name to {scoreName}");    
         scorer.name = scoreName;
     }
 }

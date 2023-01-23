@@ -6,7 +6,8 @@ namespace OodModels
     public class ScoreManagerUI : ScoreManager
     {
         [SerializeField] TextMeshProUGUI textUI;
-        //this doesn't work as expected, perhaps because I am making it with the new keyword??
+        //this doesn't work as expected, perhaps because I am making it with the new keyword
+        //changed ScoreManager to a scriptable object and create an instance in ScoringSystem
         public bool CreateScoreTextArea(string textAreaName)
         {
             try{

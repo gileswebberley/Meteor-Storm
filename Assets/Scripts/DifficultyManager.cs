@@ -23,13 +23,16 @@ namespace OodModels
 
         //introducing a monobehaviour object reference to run coroutines
         //decided that for just this functionality it wasn't worth inheriting
-        private static MonoBehaviour _mono = null;
+        //and also trying to learn how to work with C# so good experimentation
+        private static MonoBehaviour _mono;
         public static MonoBehaviour mono {
             //we just want to be able to use it for ourselves so protected access
             protected get {return _mono;}
             //but we want any MonoBehaviour to be able to set itself for us to use
             set {_mono = value;}
         }
+
+        //The difficulty properties themselves
         private static int _maxDifficulty = 5;
         public static int maxDifficulty
         {
@@ -43,6 +46,8 @@ namespace OodModels
             set { Instance.SetDifficulty(value); }
         }
 
+        //The auto difficulty change system, this is why I have the MonoBehaviour reference
+        //so I can use it's coroutine system as I am new to the concept in C#
         private float difficultyChangeTime;
 
         public void StartDifficultyStepTimer(float stepSeconds)
@@ -80,8 +85,10 @@ namespace OodModels
             }
         }
 
+        //the setters which check the bounds and clamp the values
         public void SetDifficulty(int d)
         {
+            if(d == _difficulty) return;
             Debug.Log($"SetDifficulty({d})");
             if (d > _maxDifficulty)
             {
@@ -100,6 +107,7 @@ namespace OodModels
 
         public void SetMaxDifficulty(int d)
         {
+            if(d == _maxDifficulty) return;
             Debug.Log($"SetMaxDifficulty({d})");
             if (d < 1)
             {
@@ -110,6 +118,8 @@ namespace OodModels
                 _maxDifficulty = d;
             }
         }
+
+        //It might be nice to look into some kind of operator overloading here if that's possible
         //return false if already at max difficulty
         public bool IncrementDifficulty()
         {

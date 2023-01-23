@@ -15,27 +15,31 @@ using IModels;
 
 public class GameManager : MonoBehaviour
 {
-    //create singleton Instance
-    private static GameManager _instance;
+    //create static singleton Instance
+    protected static GameManager _instance;
+    //then the Property to encapsulate it
     public static GameManager Instance
     {
         get { return _instance; }
-        protected set { _instance = value; }
     }
+
     private bool gameOver = false;
 
     //How long to wait before upping the difficulty, default 1 minute
     [SerializeField] private int difficultyChangeTime = 60;
 
+    //this is untested except with a single entry and no scene changes at the moment
     [SerializeField] private string[] gameSceneName;
 
-    //A Game USES-A (Aggregation?) spawn, score, difficulty (and leaderboard)
-    //but must surely HAVE_A (Composition?) player?
+    //A Game USES-A (Aggregation?) difficulty, boundaries?
+    //but must surely HAVE_A (Composition?) player and spawner?
     //reference to Spawn Manager via ISpawnable interface - abstraction (and encapsulation) I think?
+    ////"Spawn Manager" must be a prefab in the Resources folder
     private ISpawnable spawn;
-    //reference to the Player
+    //"Player" must be a prefab in the Resources folder
     private PlayerController player;
-    //Game Over page with restart button
+    //"Game Over Page" must be a prefab in the Resources folder
+    //it must have buttons named "Restart" and "Quit" and a TextMeshProUIGUI named "Score Ranking"
     private GameObject gameOverUI;
     //private int score = 0;
    
@@ -45,7 +49,7 @@ public class GameManager : MonoBehaviour
         //make sure there's only one otherwise it's not much of a singleton
         if (_instance != null)
         {
-            //this is not the first instance of MainManager so our singleton already exists
+            //this is not the first instance of GameManager so our singleton already exists
             Destroy(gameObject);
         }
         _instance = this;
@@ -60,8 +64,6 @@ public class GameManager : MonoBehaviour
             SetUpGameBounds();
             SetUpDifficulty();
             ScoringSystem.Instance.Scorer.AddToScore(0);
-            //gameOverUI.SetActive(false);
-            //ScoringSystem.Instance.Scorer.Hide();
             if(ScoringSystem.Instance.Leaderboard == null) ScoringSystem.Instance.SetupLeaderboard(SceneManager.GetActiveScene().name);
             CreatePlayer();
             CreateSpawner();
@@ -100,6 +102,7 @@ public class GameManager : MonoBehaviour
 
     public void CreateGameOver()
     {
+        if(gameOverUI != null) return;
         //Build the game over page from a prefab in Resources folder, like Player and SpawnManager
         //I'm doing this as I want to use GameManager to create several scenes (just for experimentation) and want to avoid all
         //of the Null Pointer exceptions that you get when you try to use a singleton in Unity it seems?
@@ -110,7 +113,7 @@ public class GameManager : MonoBehaviour
         Button restartButton = gameOverUI.transform.Find("Restart").GetComponent<Button>();
         restartButton.onClick.AddListener(RestartGame);
         Button quitButton = gameOverUI.transform.Find("Quit").GetComponent<Button>();
-        quitButton.onClick.AddListener(QuitGame);
+        quitButton.onClick.AddListener(SceneDirector.QuitGame);
         //seems to work very nicely
         if (gameOverUI == null)
         {
@@ -152,6 +155,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("GAME OVER has been called on Game Manager");
         //leave the score visible - no - replaced with ranking message below
         ScoringSystem.Instance.Scorer.Hide();
+        //set the game over flag
         gameOver = true;
         //Grabs the asset from Resources folder and attaches event handlers to the button(s)
         CreateGameOver();
@@ -175,21 +179,11 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
-        //ScoringSystem.Instance.Leaderboard.LoadLeaderboard(); - I have made this part of the constructor
         gameOver = false;
         ScoringSystem.Instance.Scorer.Show();
-        //scoreText.gameObject.SetActive(true);
-        //DifficultyManager.Instance.SetDifficulty(1);
         //make an auto difficulty change happen every difficultyChangeTime(seconds)
         //if set to zero the artist does not want to use this functionality
         if(difficultyChangeTime != 0) DifficultyManager.Instance.StartDifficultyStepTimer(difficultyChangeTime);
-
-        //just for testing as something was awry
-        // List<ScoreData> lb = ScoringSystem.Instance.Leaderboard.GetLeaderboard();
-        // foreach (ScoreData s in lb)
-        // {
-        //     Debug.Log($"Score {lb.IndexOf(s)}: {s.name} : {s.score}");
-        // }
         player.EnablePlayer();
         spawn.RestartSpawn();
     }
@@ -206,16 +200,5 @@ public class GameManager : MonoBehaviour
         Destroy(gameOverUI);
         //and (re)start the game...
         StartGame();
-    }
-
-    //Quit function that works in both Editor and application attached to Quit button
-    public void QuitGame()
-    {
-        //leaderboard.SaveLeaderboard();
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
     }
 }

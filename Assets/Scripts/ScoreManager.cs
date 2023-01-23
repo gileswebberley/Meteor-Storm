@@ -11,9 +11,18 @@ namespace OodModels
         //this could then implement a collection of ScoreManagers each with their own score? But I want to
         //reference this from several other objects which is why it seems tempting :/ No, I think that what
         //ScoreData is for so just inherit from this and simply set _thisScore to whichever one we're working with.
-        protected ScoreData _thisScore = new ScoreData();
+
+        //this is static so that it is persistent across instances in scenes - had a bit of trouble during 
+        //the creation of the Sign Up process and the scene changes therein
+        protected static ScoreData _thisScore = new ScoreData();
         public ScoreData data {
-            get {return _thisScore;}
+            get {
+                if(_thisScore == null){                    
+                    Debug.Log($"ScoreManager is creating a new ScoreData whilst being fetched");
+                     _thisScore = new ScoreData();
+                }
+                return _thisScore;
+                }
         } 
         //add in a dictionary that holds various scores and then make it a static
         //singleton so everyone can access rather than having to find the object created
@@ -23,14 +32,19 @@ namespace OodModels
         //score will always remain above or at zero
         //protected int _score = 0;
         public int score {
-            get{return _thisScore.score;}
+            //using data property to access to check there's an instance of ScoreData
+            get{return data.score;}
         }
 
         //new keyword used as it is hiding Object.name
         public new string name {
-            get {return _thisScore.name;}
+            get {
+                Debug.Log($"ScoreManager _thisScore.name is being fetched as: {_thisScore.name}");
+                return _thisScore.name;}
             //late addition but there doesn't seem any good reason to protect this from setting
-            set {_thisScore.name = value;}
+            set {
+                Debug.Log($"ScoreManager _thisScore.name is being set to: {value}");
+                _thisScore.name = value;}
         }
 
         //only use for positive numbers, a mistaken minus will be passed to remove function
