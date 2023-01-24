@@ -190,7 +190,7 @@ namespace OodModels
         //Trying to use ref for the first time, I tried using out and was warned about properties may not exist
         //moving the functionality in here where it belongs, rather than part of the PlayerController
         public bool CheckForXYBounds(Vector3 comparePosition, ref Vector3 targetVector)
-    {
+        {
         // Vector3 temp = new Vector3(1, 1, 1);
         // Vector3 tempMoveMe = new Vector3(0, 0, 0);
         bool isHittingBounds = false;
