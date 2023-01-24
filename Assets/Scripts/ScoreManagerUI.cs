@@ -16,7 +16,7 @@ namespace OodModels
             return true;
             }
             catch{
-                Debug.LogError("Cannot find the score text area named: "+textAreaName);
+                Debug.Log("Cannot find the score text area named: "+textAreaName);
                 return false;
             }
         }

@@ -14,7 +14,7 @@ public class SceneDirector : MonoBehaviour
         if(SceneManager.GetActiveScene().name == "Leaderboard") ScoringSystem.Instance.PrintLeaderboard(GameObject.Find("LeaderboardTextArea").GetComponent<TextMeshProUGUI>());
     }
     //for the start button on the sign up page to grab the name before going on to the game
-    public void SignUpAndStart(TMP_InputField inputScoreName)
+    public void SignUp(TMP_InputField inputScoreName)
     {
         Debug.Log($"Sign up with the name {inputScoreName.text}");
         if(inputScoreName.text == "") return;//so it will create a guest score
@@ -22,7 +22,9 @@ public class SceneDirector : MonoBehaviour
         //can't have two properties in the editor it seems so doing this seperately
         //LoadSceneByButtonName(caller);
     }
-
+    //for the Quit button in the game over page that is created by GameManager.
+    //as I'm trying to attach it via AddListener I couldn't pass in the string,
+    //had a quick go using a delegate but need to look into why that didn't help
     public static void GoToStart()
     {
         SceneManager.LoadScene("Welcome");
@@ -32,6 +34,10 @@ public class SceneDirector : MonoBehaviour
     {
         SceneManager.LoadScene(nameStr);
     }
+
+    //created this so I just have to name the button the same as the scene name
+    //and then pass it in as a parameter set in the Editor when it's attached to
+    //the OnClick event. Used throughout the menu scenes
     public void LoadSceneByButtonName(GameObject caller)
     {
         Debug.Log($"Load scene named {caller.name}");

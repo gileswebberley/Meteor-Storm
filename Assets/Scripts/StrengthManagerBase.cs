@@ -25,6 +25,14 @@ namespace GilesManagers
             get { return _maxStrength; }
         }
 
+        
+        //set by artist and used for strength slider UI
+        [SerializeField] protected float _minStrength = 0f;
+        public float minStrength
+        {
+            get { return _minStrength; }
+        }
+
         //I was going to implement a listener for game over but instead decided to
         //return a boolean from AddDamageLevel() which can be examined for death
 
@@ -62,9 +70,9 @@ namespace GilesManagers
             Debug.Log("DAMAGE: Strength is now: " + _strength);
 
             //If we are completely damaged it's game over
-            if (_strength <= 0)
+            if (_strength <= _minStrength)
             {
-                _strength = 0;
+                _strength = _minStrength;
                 return false;
                 //this functionality comes from returning the bool above so game manager keeps control of state
                 //gameHQ.GameOver();

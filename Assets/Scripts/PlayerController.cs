@@ -52,6 +52,8 @@ public class PlayerController : MonoBehaviour
     private IStrengthManager strengthManager;
     //for laser power, removed by firing according to max-rounds setting in weapon
     private IStrengthManager powerManager;
+    //trying to use this to produce a gui for the speed
+    private IStrengthManager speedManager;
     //our gun which is enabled by our PowerManager
     private LaserWeapon laser;
     public LaserWeapon Laser{
@@ -70,7 +72,10 @@ public class PlayerController : MonoBehaviour
         //connect with game manager - no need just use the Instance for GameOver()
         //gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
         //grab the strength manager which uses a slider as it's UI
-        strengthManager = GetComponent<StrengthManager>();
+        StrengthManager[] strengthManagers = GetComponents<StrengthManager>();
+        //this is a problem with my entire design now that I want to add a speed UI as another Strength Manager :/
+        strengthManager = strengthManagers[0];
+        speedManager = strengthManagers[1];
         //and the power manager (which is also a StrengthManagerBase with different UI behaviour)
         powerManager = GetComponent<PowerManager>();
         //plug in our laser
@@ -143,6 +148,7 @@ public class PlayerController : MonoBehaviour
         bIsPlaying = false;
         //yep, so it can hide the text and the indicator
         strengthManager.Disable();
+        speedManager.Disable();
         powerManager.Disable();
         //this makes all of the physics stop so pause the game
         Time.timeScale = 0;
@@ -158,11 +164,16 @@ public class PlayerController : MonoBehaviour
         strengthManager.Reset();
         strengthManager.AddStrengthLevel(aStrength);
 
+        //introducing the speedManager
+        speedManager.Enable();
+        speedManager.Reset();
+        //taking this out into a strength manager
+        speed = speedManager.strength;
+
         powerManager.Enable();
         powerManager.Reset();
         //then add to the start power
         powerManager.AddStrengthLevel(aPower);
-        speed = minSpeed;
         //Unpause the physics
         Time.timeScale = 1;
         bIsPlaying = true;
@@ -280,9 +291,12 @@ public class PlayerController : MonoBehaviour
 
     void ChangeSpeed(float toChangeBy)
     {
-        speed += toChangeBy;
-        if (speed > maxSpeed) speed = maxSpeed;
-        if (speed < minSpeed) speed = minSpeed;
+        if(toChangeBy > 0) speedManager.AddStrengthLevel(toChangeBy);
+        else speedManager.AddDamageLevel(toChangeBy*-1);
+        speed = speedManager.strength;
+        // speed += toChangeBy;
+        // if (speed > maxSpeed) speed = maxSpeed;
+        // if (speed < minSpeed) speed = minSpeed;
         Debug.Log("Speed is: " + speed);
     }
 }

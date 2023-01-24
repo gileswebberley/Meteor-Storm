@@ -14,6 +14,8 @@ for entering a player's name before playing the game - that's why it doesn't fee
 to still have it tied up with the game manager (perhaps that doesn't need to be a singleton
 in the end? - no, I might want it across levels?)
 */
+
+//Brings together the score manager and the leaderboard
 public class ScoringSystem : MonoBehaviour
 {
     //hold the singleton object reference all the work is done in Awake()
