@@ -17,6 +17,7 @@ using IModels;
 public class SpawnManager : SpawnerBase
 {
     //3DSpaceSpawn specific library of objects to be spawning
+    //Enemies must implement ISpawnedEnemy interface
     public GameObject[] planetPrefabs;
     public GameObject[] meteorPrefabs;
     public GameObject[] powerPrefabs;
@@ -38,6 +39,9 @@ public class SpawnManager : SpawnerBase
     private float spawnZMoveMultiplier = 2f;
     //we subtract this from GameBounds.minZ to move it in front of the player
     private float spawnZMoveOffset = 100f;
+    //Hide these inherited variables so that they appear in the Editor, need to work out why... 
+    [SerializeField] int minimumSpawnAmount = 5;
+    [SerializeField] int maximumSpawnAmount = 10;
     
 
     void Start()
@@ -56,6 +60,9 @@ public class SpawnManager : SpawnerBase
         maxSpawnY = GameBounds.maxY;
         minSpawnX = GameBounds.minX;
         minSpawnY = GameBounds.minY;
+        //a workaround to solve the issue with SerializeField not coming down the inheritance chain
+        minSpawnAmount = minimumSpawnAmount;
+        maxSpawnAmount = maximumSpawnAmount;
     }
 
     // Update is called once per frame
@@ -92,6 +99,14 @@ public class SpawnManager : SpawnerBase
     public override void RestartSpawn(){
         if(bHasStarted){
             ResetSpawnZ();
+            //Now find any enemy objects that still exist, have to look for MeteorBehaviour as ISpawnedEnemy does not work in this context
+            ISpawnedEnemy[] toClearUp = GameObject.FindObjectsOfType<MeteorBehaviour>();
+            //then remove them before starting a new spawn
+            foreach(ISpawnedEnemy o in toClearUp)
+            {
+                o.RemoveFromSpawn();
+                Debug.Log("Enemy removed from scene on Restart");
+            }
         }
         StartSpawn();
     }
@@ -117,7 +132,8 @@ public class SpawnManager : SpawnerBase
         //Check that our enemies implement ISpawnedEnemy with a type check
         foreach(GameObject o in meteorPrefabs){
             //this checks that the GameObject will add/remove itself from the counter
-            if(!o is ISpawnedEnemy)//VSCode says this won't work but it does
+            ISpawnedEnemy test = o.GetComponent<ISpawnedEnemy>();
+            if(test == null)
             {
                 Debug.LogError("ENEMY PREFAB (meteor) IS NOT OF TYPE ISpawnedEnemy - unable to spawn");
                 enemyOk = false;
@@ -126,20 +142,25 @@ public class SpawnManager : SpawnerBase
         }
         foreach(GameObject o in planetPrefabs){
             //this checks that the GameObject will add/remove itself from the counter
-            if(!o is ISpawnedEnemy)//VSCode says this won't work but it does
+            ISpawnedEnemy test = o.GetComponent<ISpawnedEnemy>();
+            if(test == null)
             {
                 Debug.LogError("ENEMY PREFAB (planet) IS NOT OF TYPE ISpawnedEnemy - unable to spawn");
                 enemyOk = false;
                 break;
             }
         }
-
+        //if all of the enemies implement ISpawnedEnemy
         if(enemyOk){
             int diff = DifficultyManager.difficulty;
             //make it based on a difficulty, so as it gets more difficult you get more meteors and less power ups
             SpawnMeteors(minSpawnAmount*diff,maxSpawnAmount*diff);
             //these are mainly for the enviromental aesthetic
             SpawnPlanets(1,3);
+        }
+        //or if they don't then don't allow any spawning
+        else{
+            bIsSpawning = false;
         }
     }
 

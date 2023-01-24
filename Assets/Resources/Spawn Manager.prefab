@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6476945792844417434
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6476945792844417433}
+  - component: {fileID: 6476945792844417432}
+  m_Layer: 0
+  m_Name: Spawn Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6476945792844417433
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6476945792844417434}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.57098866, y: 2.2898588, z: 15.77998}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6476945792844417432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6476945792844417434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6390aa619668be628c511ca057c3568, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  planetPrefabs:
+  - {fileID: 3207798350248953562, guid: c22c24efd08e0fee0a35cfe0def82248, type: 3}
+  meteorPrefabs:
+  - {fileID: 5885495742218963574, guid: 16bac2aa35fbf8cd4b7b357acb762d71, type: 3}
+  powerPrefabs:
+  - {fileID: 7693015391549679443, guid: 923edd35eeb5f733d9bc368abb103247, type: 3}
+  - {fileID: 3334328664307809406, guid: f90e8a2a0d5408712b318d3df883bd1f, type: 3}
+  starPrefabs:
+  - {fileID: 6322974711906818595, guid: fc334623ec59263b6a2eb7662b5459fa, type: 3}
+  minimumSpawnAmount: 5
+  maximumSpawnAmount: 10

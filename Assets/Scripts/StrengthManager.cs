@@ -22,6 +22,8 @@ namespace GilesManagers
             sliderFill = strengthSlider.fillRect.gameObject;
             //set the slider parameters to match the strength
             strengthSlider.maxValue = _maxStrength;
+            strengthSlider.minValue = _minStrength;
+            UpdateUI();
             //a test whether I've grabbed the correct game object
             //yep, so it can hide the text and the indicator
             strengthUIArea.SetActive(true);

@@ -1,21 +1,14 @@
 using System.Collections;
-using System.Collections.Generic;
 using System;
 
 namespace OodModels
 {
-
-    //Templating seemed to make it work, ie <ScoreData>
-    [System.Serializable]
-    public class ScoreDataList<ScoreData>
-    {
-        public List<ScoreData> list = new List<ScoreData>(100);
-    }
-
     //I believe the IComparable will make Sort<ScoreData>() function based on score
     [System.Serializable]
     public class ScoreData : IComparable<ScoreData>
-    {
+    {        
+        public string name;
+        public int score;
         //default constructor
         public ScoreData()
         {
@@ -29,8 +22,6 @@ namespace OodModels
             name = n;
             score = s;
         }
-        public string name;
-        public int score;
 
         //trying to implement sorting based on score but not sure how to
         public int CompareTo(ScoreData y)

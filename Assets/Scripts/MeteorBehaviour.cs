@@ -54,6 +54,7 @@ public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy
             Debug.LogError("RemoveFromSpawn called without ISpawnable reference");
             return;
         }
+        //move this to OnDestroy 
         --spawn.currentSpawnedEnemies;
         //we've removed ourselves so we must be dead, let's ensure that
         Destroy(gameObject);
@@ -73,16 +74,21 @@ public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy
     void OnTriggerEnter(Collider other){
         if(other.CompareTag("LaserShot")){
             //hit by a laser, check how powerful it is
-            power -= player.GetLaserPower();
+            power -= player.Laser.laserPower;//GetLaserPower();
             //remove laser shot that hit
             Destroy(other.gameObject);
             if(power <= 0){
                 //can't get the particle system to work :( ++ There we go, simply use Instantiate rather than try to play it
                 Instantiate(explodePS,transform.position, transform.rotation);
                 //add my original power to the player score
-                gameHQ.UpdateScore(((int)startPower));//warning casting to int
+                ScoringSystem.Instance.Scorer.AddToScore((int)startPower);//warning casting to int
                 RemoveFromSpawn();
             }
         }
+    }
+
+    void OnDestroy()
+    {
+        //perhaps removing from the spawn count should happen here although it could end up causing an awful loop?
     }
 }

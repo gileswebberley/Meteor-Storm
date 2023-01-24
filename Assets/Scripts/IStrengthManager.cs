@@ -14,8 +14,10 @@ namespace IModels
         }
         //called before use
         public void Enable();
-        //called to reset/pause
+        //called to pause/hide
         public void Disable();
+        //reset to start strength
+        public void Reset();
         //set up how your going to present your strength
         public abstract void EnableUI();
         //hide the UI
