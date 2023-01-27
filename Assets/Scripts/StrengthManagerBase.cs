@@ -1,7 +1,7 @@
 using UnityEngine;
-using IModels;
+using GilesSpawnSystem;
 
-namespace GilesManagers
+namespace GilesStrengthSystem
 {
     public class StrengthManagerBase : MonoBehaviour, IStrengthManager
     {

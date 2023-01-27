@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //namespace for GameBounds singleton that is set in Gamemanager
-using OodModels;
-using IModels;
+using GilesScoreSystem;
+using GilesSpawnSystem;
+using GilesManagers;
 
 /*
     perhaps x, y, and z bounds should be part of the GameManager with which

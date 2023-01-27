@@ -1,9 +1,9 @@
 using UnityEngine;
 using TMPro;
 
-namespace OodModels
+namespace GilesScoreSystem
 {
-    public class ScoreManagerUI : ScoreManager
+    public class ScoreManagerUI : ScoreManagerSO
     {
         [SerializeField] TextMeshProUGUI textUI;
         //this doesn't work as expected, perhaps because I am making it with the new keyword

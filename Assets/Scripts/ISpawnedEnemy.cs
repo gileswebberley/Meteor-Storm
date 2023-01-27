@@ -1,4 +1,4 @@
-namespace IModels
+namespace GilesSpawnSystem
 {
     //as a way to track numbers without using FindObjectsOfType<MeteorBehaviour>
     public interface ISpawnedEnemy

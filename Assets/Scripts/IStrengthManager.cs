@@ -1,4 +1,4 @@
-namespace IModels
+namespace GilesStrengthSystem
 {
     public interface IStrengthManager
     {

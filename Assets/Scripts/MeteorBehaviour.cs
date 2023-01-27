@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 //using System;
 using UnityEngine;
-using IModels;
+using GilesSpawnSystem;
+using GilesScoreSystem;
+using GilesWeapons;
 
 public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy
 {
@@ -13,7 +15,7 @@ public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy
     //when we're hit check how powerful the laser is that hit us by checking player
     //private PlayerController player;
     //so we can add our score via the GameManager
-    private GameManager gameHQ;
+    //private GameManager gameHQ; - now using GilesManagers.GameProperties
 
     //implement ISpawnedEnemy spawn
     protected ISpawnable _spawn;
@@ -30,7 +32,7 @@ public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy
         
         //for scoring
         startPower = power;
-        gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
+        //gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
 
         //for spawn manager count
         AddToSpawn();
@@ -39,30 +41,26 @@ public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy
         thisRB.AddTorque(Random.Range(-5,5),Random.Range(-5,5),Random.Range(-5,5),ForceMode.Force);
     }
 
-    protected override void Update()
+    protected override void FixedUpdate()
     {//this checks that the GameObject will add/remove itself from the counter
-        //we want to change the death behaviour so don't run base.Update();
-        if(!RbAddForwardForce()){//means we're out of GameBounds.z//this checks that the GameObject will add/remove itself from the counter
+        //we want to change the death behaviour so don't run base.FixedUpdate();
+        if(!RbAddForce(Vector3.forward)){//means we're out of GameBounds.z//this checks that the GameObject will add/remove itself from the counter
             RemoveFromSpawn();
         }
     }
 
     //this is the ISpawnedEnemy stuff, I want to make sure that spawn manager keeps track of our death 
-    public void RemoveFromSpawn(){
-        //if we haven't been added we won't have a reference to spawn, as it should be I think
-        if(spawn == null){
-            Debug.LogError("RemoveFromSpawn called without ISpawnable reference");
-            return;
-        }
-        //move this to OnDestroy 
-        --spawn.currentSpawnedEnemies;
+    public void RemoveFromSpawn()
+    {
         //we've removed ourselves so we must be dead, let's ensure that
         Destroy(gameObject);
+        //now removing from spawn count is done in OnDestroy()
     }
 
-    public void AddToSpawn(){
+    public void AddToSpawn()
+    {
         //set up our reference to an ISpawnable (which has a currentSpawnedEnemies property)
-        spawn = GameObject.Find("Spawn Manager").GetComponent<SpawnManager>() as ISpawnable;
+        spawn = GameObject.Find(TagManager.SPAWN).GetComponent<SpawnManager>() as ISpawnable;
         if(spawn == null){
             Debug.LogError("MeteorBehaviour.AddToSpawn cannot find an ISpawnable reference");
             return;
@@ -72,9 +70,9 @@ public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy
     }
 
     void OnTriggerEnter(Collider other){
-        if(other.CompareTag("LaserShot")){
+        if(other.CompareTag(TagManager.BULLET)){
             //hit by a laser, check how powerful it is
-            power -= player.Laser.laserPower;//GetLaserPower();
+            power -= other.gameObject.GetComponent<LaserBehaviour>().laserPower;//GetLaserPower();
             //remove laser shot that hit
             Destroy(other.gameObject);
             if(power <= 0){
@@ -90,5 +88,12 @@ public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy
     void OnDestroy()
     {
         //perhaps removing from the spawn count should happen here although it could end up causing an awful loop?
+         //if we haven't been added we won't have a reference to spawn, as it should be I think
+        if(spawn == null){
+            Debug.LogError("RemoveFromSpawn called without ISpawnable reference");
+            return;
+        }
+        //move this to OnDestroy 
+        --spawn.currentSpawnedEnemies;
     }
 }

@@ -1533,9 +1533,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8e21036d4afcc58faa6a0842287ce8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _startStrength: 5
-  _maxStrength: 20
-  _minStrength: 5
+  _startStrength: 3
+  _maxStrength: 15
+  _minStrength: 1
   strengthSlider: {fileID: 189378124933078856}
   strengthUIArea: {fileID: 12225346479359765}
 --- !u!114 &9205699485012269343

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace OodModels
+namespace GilesScoreSystem
 {
     //This was originally ScoreManager! realised that this is something to use WITH scores not FOR them
     public abstract class Leaderboard

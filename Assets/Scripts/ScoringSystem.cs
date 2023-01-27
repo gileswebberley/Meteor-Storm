@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using OodModels;
+using GilesScoreSystem;
 using TMPro;
 
 /*
@@ -14,7 +14,7 @@ for entering a player's name before playing the game - that's why it doesn't fee
 to still have it tied up with the game manager (perhaps that doesn't need to be a singleton
 in the end? - no, I might want it across levels?)
 */
-
+namespace GilesScoreSystem{
 //Brings together the score manager and the leaderboard
 public class ScoringSystem : MonoBehaviour
 {
@@ -28,7 +28,7 @@ public class ScoringSystem : MonoBehaviour
 
     //This is why we've added the TMPro library
     //This is the name of the text area used for the score - default set
-    [SerializeField, Tooltip("Create a TMPro text area and place in your scene (ensure it is Enabled) - Enter the name of the object here")]
+    [SerializeField, Tooltip("Create a TMPro text area for thwe score and place in your scene (ensure it is Enabled) - Enter the name of the object here")]
     private string scoreTMPName = "Score Text";
     //score replaced by a score manager which the game manager has access to
     private static ScoreManagerUI scorer;
@@ -45,6 +45,8 @@ public class ScoringSystem : MonoBehaviour
         get{return leaderboard;}
         //protected set {leaderboard = value;}
     }
+
+    public string leaderboardName = "MeteorStorm";
 
     //as far as I understand this will run when a new scene is loaded whereas Start will not?
     void Awake()
@@ -64,25 +66,26 @@ public class ScoringSystem : MonoBehaviour
         if(scorer == null) scorer = ScriptableObject.CreateInstance("ScoreManagerUI") as ScoreManagerUI;
         // //now we search the scene that's just loaded to see if we can find an appropriately named text area
         scorer.CreateScoreTextArea(scoreTMPName);
-        SetupLeaderboard("MeteorStorm");
+        SetupLeaderboard(leaderboardName);
     }
 
     public void PrintLeaderboard(TextMeshProUGUI textArea)
     {
-        textArea.alignment = TextAlignmentOptions.Center;
-        textArea.text = "LEADERBOARD\n\nRank : Name : Score\n";
+        textArea.alignment = TextAlignmentOptions.MidlineJustified;
+        textArea.text = "LEADERBOARD\nRank : Name : Score\n\n";
         List<ScoreData> lb = leaderboard.GetLeaderboard();
         foreach (ScoreData s in lb)
         {
-            textArea.text += $"{lb.IndexOf(s)+1} : {s.name} : {s.score}\n";
+            textArea.text += $"{lb.IndexOf(s)+1} {s.name} {s.score}\n";
             //Debug.Log($"Score {lb.IndexOf(s)}: {s.name} : {s.score}");
         }
     }
-    public void SetupLeaderboard(string leaderboardName)
+    public void SetupLeaderboard(string _leaderboardName)
     {
-        if(leaderboard != null) return;     
-        //if the leaderboardName is already loaded it 
-        leaderboard = new FileLeaderboard(leaderboardName);
+        //just check whether we have a leaderboard already and whether it is already the one we want
+        if(leaderboard != null && leaderboard.leaderboardName == _leaderboardName) return;     
+        //otherwise create a new one with this name
+        leaderboard = new FileLeaderboard(_leaderboardName);
     }
 
     public void SetUpScoringName(string scoreName)
@@ -90,4 +93,5 @@ public class ScoringSystem : MonoBehaviour
         Debug.Log($"Setting score name to {scoreName}");    
         scorer.name = scoreName;
     }
+}
 }

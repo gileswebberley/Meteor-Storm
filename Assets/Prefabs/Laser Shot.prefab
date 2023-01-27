@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 737460582126842779}
   - component: {fileID: 7502097180307623570}
   - component: {fileID: 7764167509922083569}
-  - component: {fileID: -2182899109398502170}
   - component: {fileID: 1839506341053177660}
+  - component: {fileID: 8716526110814307562}
   m_Layer: 0
   m_Name: Laser Shot
   m_TagString: LaserShot
@@ -100,19 +100,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.049872812, y: 0, z: -0}
---- !u!114 &-2182899109398502170
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2662479520080950041}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2d13930277a2608381b6eda27be5e9a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: -50
 --- !u!54 &1839506341053177660
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -129,3 +116,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &8716526110814307562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2662479520080950041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8e6e6925e1eafe4a861ce5b30c4f193, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 20
+  speedModifier: 5
+  laserPower: 1

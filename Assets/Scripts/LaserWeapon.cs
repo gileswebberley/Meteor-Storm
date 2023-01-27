@@ -1,8 +1,8 @@
 using System.Collections;
 using UnityEngine;
-using IModels;
+using GilesSpawnSystem;
 
-namespace OodModels
+namespace GilesWeapons
 {
     public class LaserWeapon : MonoBehaviour
     {
@@ -33,6 +33,8 @@ namespace OodModels
                 Debug.Log("FIRE!!!");
                 bIsFiring = true;
                 GameObject shot = Instantiate(laser, gunPosition.transform.position, gunPosition.transform.rotation);
+                //think we'll just leave it to be set in the Editor as it doesn't make sense to change it
+                //shot.GetComponent<LaserBehaviour>().laserPower = laserPower;
                 StartCoroutine(LimitShotsPerSecond());
                 //let them know we've successfully fired our weapon
                 return true;

@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 //custom namespace created for my attempts at refactoring Meteor Storm
-namespace OodModels
+namespace GilesManagers
 {
     //break out functionality from GameManager, MonoBehaviour is for Start/StopCoroutine()
     //only want one per game I think, perhaps call it StaticDifficultyManager 
@@ -71,6 +71,7 @@ namespace OodModels
             }
         }
 
+        //the timer function itself
         IEnumerator DifficultyChangeTimer()
         {
             Debug.Log("DifficultyChangeTimer waiting....");

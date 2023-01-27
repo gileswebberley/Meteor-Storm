@@ -1,6 +1,6 @@
 using System.ComponentModel;
 using UnityEngine;
-using IModels;
+using GilesSpawnSystem;
 
 /*
 This is the abstract base class that implements the ISpawnable interface and brings
