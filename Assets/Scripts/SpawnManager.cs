@@ -37,7 +37,7 @@ public class SpawnManager : SpawnerBase
 
     //so we can move the z-index after first birth
     //we divide the GameBounds.maxZ for the first spawn maxSpawnZ
-    private float spawnZMoveMultiplier = 2f;
+    private float spawnZMoveMultiplier = 1.5f;
     //we subtract this from GameBounds.minZ to move it in front of the player
     private float spawnZMoveOffset = 100f;
     //Hide these inherited variables so that they appear in the Editor, need to work out why... 
@@ -88,9 +88,9 @@ public class SpawnManager : SpawnerBase
     //Produces the close up first spawn and then shifts z-bounds
     public override void StartSpawn(){
         SpawnAll();
-        Debug.Log("SpawnAll() called from StartSpawn() ");
         //... then move the z spawn backwards as in Start()
         minSpawnZ = maxSpawnZ;
+        Debug.Log($"SpawnAll() called from StartSpawn() : minSpawnZ = {minSpawnZ}");
         maxSpawnZ = GameBounds.maxZ;
         bIsSpawning = true;
         bHasStarted = true;
@@ -176,7 +176,7 @@ public class SpawnManager : SpawnerBase
         SpawnStars(minSpawnAmount/3,maxSpawnAmount/3);
     }
 
-    //These could be derived class (3DSpaceSpawner) behaviour that is put in to honour our Spawnability
+    //++ must implement object pooling
     void SpawnPlanets(int min, int max){
         //we don't want many planets, they're rather rare
         int totalSpawn = Random.Range(min,max);

@@ -4,12 +4,22 @@ using UnityEngine;
 //for GameBounds which are set in GameManager
 using GilesManagers;
 
+namespace GilesMovement{
+
+public interface IHaveSpeed{
+    public float Speed {get;}
+}
+
 //using this directive makes Unity Editor add the component to the game object
 //it's attached to if missing
 [RequireComponent(typeof(Rigidbody))]
-public class MoveForwardRb : MonoBehaviour
+public class MoveForwardRb : MonoBehaviour, IHaveSpeed
 {
-    public float speed = 5f;
+    protected float speed = 5f;
+    public float Speed {
+        get{return speed;}
+        protected set{speed = value;}
+    }
     //just for fine tuning the movement
     [SerializeField] float speedModifier = 5f;
     
@@ -55,4 +65,5 @@ public class MoveForwardRb : MonoBehaviour
         //we are within bounds after moving forwards
         return true;
     }
+}
 }

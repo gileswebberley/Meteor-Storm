@@ -28,7 +28,7 @@ public static class TagManager
     public const string ENEMY1 = "Planet";
     public const string ENEMY2 = "Meteor";
     public const string ENEMY3 = "Star";
-
+    //name of the laser shot prefab
     public const string BULLET = "LaserShot";
 
     //SceneDirector has a kinda OnLoad functionality for filling a text area within the Leaderboard scene
@@ -38,6 +38,9 @@ public static class TagManager
     //learnt that arrays have to be redonly rather than const because the value is not initialised until run-time
     public static readonly string[] GAME_SCENE_NAMES = new string[] {"MeteorStorm"};
 
+    public const string AUDIO_MANAGER_SOURCE = "AudioSourceObject";
+
     //just a test for using in GetComponent() not sure this even makes logical sense!?
-    //public static System.Type PLAYER_TYPE = PlayerController;
+    //testing whether we can use this in combination with System.Types.GetType() - not currently
+    public static string PLAYER_TYPE = typeof(PlayerController).AssemblyQualifiedName;
 }

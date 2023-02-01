@@ -1,11 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
+// using System.Collections;
+// using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+//using UnityEngine.UI;
 //bits that I'm trying
 using GilesStrengthSystem;
 using GilesWeapons;
 using GilesManagers;
+//using GilesMovement;
+using GilesUtilities;
 
 [RequireComponent(typeof(StrengthManager))]
 [RequireComponent(typeof(PowerManager))]
@@ -16,6 +18,10 @@ public class PlayerController : MonoBehaviour
     //very important boolean - possible for IPlayable me thinks
     private bool bIsPlaying = false;
 
+    //sound clips to play for playing when colliding
+    public AudioClip strengthSound, powerSound;
+    public AudioClip damageSound;
+
     //Movement related control system
     private Rigidbody playerRB;
     //all the speed based properties -------
@@ -24,11 +30,14 @@ public class PlayerController : MonoBehaviour
     private IStrengthManager speedManager;
     private float speed = 10f;
     public float Speed{
-        //with changes to MoveForwardRb this needs tweaking
+        //with changes to MoveForwardRb using VelocityChange this needs tweaking
         get{return 5 + speedManager.strength;}
     }
     
     //Rotational movement system
+    public AudioClip boosterSound;
+    //gonna have to add some placeholders for the position of the booster engines as I am struggling to rotate with view
+    [SerializeField] Transform boosterLeft, boosterRight;
     //the amount of torque added by imaginary booster rockets (help get control back when spinning)using System.Collections;
     private float rotationalBoosters = 0.5f;
     //The number by which targetVector.x is divided within AddTorque()
@@ -68,8 +77,6 @@ public class PlayerController : MonoBehaviour
     //Use Awake to get all your references (instantiate objects) to avoid the dreaded NullReferenceExeption
     void Awake()
     {
-        //connect with game manager - no need just use the Instance for GameOver()
-        //gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
         //grab the strength managers which uses a slider as it's UI
         //with multiple strength managers they appear in the array in the order they are in the inspector
         StrengthManager[] strengthManagers = GetComponents<StrengthManager>();
@@ -123,11 +130,13 @@ public class PlayerController : MonoBehaviour
         //Mouse button input...
         if (Input.GetMouseButtonDown(0))
         {
+            PlaySound(boosterSound, boosterLeft.position);
             // LEFT BUTTON for rotational correction boosters on the left side of ship (rotates clockwise)
             playerRB.AddTorque(Vector3.forward * rotationalBoosters * Speed, ForceMode.Impulse);
         }
         if (Input.GetMouseButtonDown(1))
         {
+            PlaySound(boosterSound, boosterRight.position);
             // RIGHT BUTTON for rotational correction boosters on the right side of ship (rotates anti-clockwise)
             playerRB.AddTorque(Vector3.forward * -rotationalBoosters * Speed, ForceMode.Impulse);
         }
@@ -146,12 +155,13 @@ public class PlayerController : MonoBehaviour
     }
 
     //Reset strength, power, speed, rotation and set bIsPlaying = true;
-    public void EnablePlayer(float aStrength, float aPower)
-    {
-        EnablePlayer();
-        strengthManager.AddStrengthLevel(aStrength);
-        powerManager.AddStrengthLevel(aPower);
-    }
+    //no longer used since implementing strength managers
+    // public void EnablePlayer(float aStrength, float aPower)
+    // {
+    //     EnablePlayer();
+    //     strengthManager.AddStrengthLevel(aStrength);
+    //     powerManager.AddStrengthLevel(aPower);
+    // }
 
     public void EnablePlayer()
     {        
@@ -175,7 +185,15 @@ public class PlayerController : MonoBehaviour
         bIsPlaying = true;
     }
 
-    // Behaviour when hit by collider with isTrigger = true
+    
+    void PlaySound(AudioClip ac, Vector3 pos)
+    {
+        //check if we have a sound to play on death and if we have access to an AudioManager
+        string qualifiedName = typeof(AudioManager).AssemblyQualifiedName;
+        if (ac != null && System.Type.GetType(qualifiedName) != null) AudioManager.PlaySoundFromPosition(pos, ac);
+    }
+
+    // Behaviour when hit by collider with isTrigger = true which are bonuses
     private void OnTriggerEnter(Collider other)
     {
         //disable all behaviour if the player is dead
@@ -184,12 +202,14 @@ public class PlayerController : MonoBehaviour
         {
             //Charge up so add laser power
             powerManager.AddStrengthLevel(1);// AddPowerLevel(1);
+            PlaySound(powerSound, other.gameObject.transform.position);
             Destroy(other.gameObject);
         }
         else if (other.CompareTag(TagManager.HEALTHBONUS))
         {
             //add a bit of strenth
             strengthManager.AddStrengthLevel(strengthManager.maxStrength / 10f);
+            PlaySound(strengthSound, other.gameObject.transform.position);
             Destroy(other.gameObject);
         }
     }
@@ -214,21 +234,11 @@ public class PlayerController : MonoBehaviour
         {
             // You've bumped into an Enemy
             GameObject otherGO = other.gameObject;
+            PlaySound(damageSound, other.gameObject.transform.position);
             //if AddDamageLevel makes strength below zero it returns false, so then call GameOver()
-            if (!strengthManager.AddDamageLevel(CalculateRbDamage(otherGO))) GameManager.Instance.GameOver();
+            if (!strengthManager.AddDamageLevel(StrengthManager.CalculateRbDamage(otherGO, speed, playerRB.mass))) GameManager.Instance.GameOver();
         }
     }
-
-    //use speed and rigidbody mass to calculate the damage level due to a collision
-    float CalculateRbDamage(GameObject otherGO)
-    {
-        //How big was the hit? Basic sum based on mass and speed
-        //using polymorphism? with MoveForwardRb which is the base moving class
-        float damage = Speed + otherGO.GetComponent<MoveForwardRb>().speed;
-        damage += otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
-        return damage;
-    }
-
     //the mouse motion control set up
     void SetupTargetVector()
     {
@@ -274,7 +284,8 @@ public class PlayerController : MonoBehaviour
     //public float GetSpeed(){return speed;}
     //implement as Properties now I've discovered that's how
     //c# deals with encapsulation
-
+    //became important again when using a strength manager for speed with a UI
+    //and implementing my GameProperties
     void ChangeSpeed(float toChangeBy)
     {
         if(toChangeBy > 0) speedManager.AddStrengthLevel(toChangeBy);

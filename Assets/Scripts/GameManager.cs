@@ -83,6 +83,8 @@ public class GameManager : MonoBehaviour
         GameObject playerGO = UnityEngine.Object.Instantiate(Resources.Load(TagManager.PLAYER)) as GameObject;
         //set the name so that the MoveForwardRb can still find the speed
         playerGO.name = TagManager.PLAYER;
+        //a little attempt at extending TagManager to include component Types
+        //System.Type tmpP = System.Type.GetType(TagManager.PLAYER_TYPE);
         player = playerGO.GetComponent<PlayerController>();
         if (player == null)
         {

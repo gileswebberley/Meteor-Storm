@@ -32,7 +32,7 @@ public abstract class SpawnerBase : MonoBehaviour, ISpawnable {
     public float maxSpawnX { get; protected set; }
     public float minSpawnY { get; protected set; }
     public float maxSpawnY { get; protected set; }
-    //Encapsulation with value checking through Property Methods
+    //Encapsulation with value checking through simple Property Methods
     protected float _minSpawnZ = -100f;
     public float minSpawnZ {
         get {return _minSpawnZ;} 
@@ -44,9 +44,10 @@ public abstract class SpawnerBase : MonoBehaviour, ISpawnable {
         protected set { _maxSpawnZ = value;}
     }
 
+
     private int _currentSpawnedEnemies = 0;
     public int currentSpawnedEnemies{
-        //how do I make this thread safe with a lock?
+        //how do I make this thread safe with a lock? doesn't matter atm
         get{return _currentSpawnedEnemies;}
         set {
             Debug.Log("currentSpawnedEnemies: "+_currentSpawnedEnemies);
