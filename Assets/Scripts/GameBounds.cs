@@ -3,10 +3,11 @@ using System.Collections;
 using UnityEngine;
 
 //custom namespace created for my attempts at refactoring Meteor Storm
-namespace OodModels
+namespace GilesManagers
 {
     /*
-    A singleton to give access to centralised game bounds that is managed
+    A singleton to give access to centralised game bounds that is managed.
+    Could/should this be a struct?
     */
     public class GameBounds
     {
@@ -21,31 +22,7 @@ namespace OodModels
             get { return _instance; }
         }
 
-        /*
-        To do the same but with a MonoBehaviour subclass
-        private static GameBounds _instance;
-        public static GameBounds Instance{
-            get {return _instance;}
-            protected set {_instance = value;}
-        }
-
-        private void Awake()
-        {
-            //make sure there's only one otherwise it's not much of a singleton
-            if (Instance != null)
-            {
-                //this is not the first instance of MainManager so our singleton already exists
-                Destroy(gameObject);
-                //no need to carry on with script...
-                return;
-            }
-            Instance = this;
-            //to make persistant between scenes
-            DontDestroyOnLoad(gameObject);
-        }
-        */
-
-
+        //Just learning about Properties
         private static Vector3 _minBounds;
         //This is the public interface for setting bounds (as 2 Vector3s)
         public static Vector3 minBounds
@@ -190,12 +167,8 @@ namespace OodModels
         //Trying to use ref for the first time, I tried using out and was warned about properties may not exist
         //moving the functionality in here where it belongs, rather than part of the PlayerController
         public bool CheckForXYBounds(Vector3 comparePosition, ref Vector3 targetVector)
-    {
-        // Vector3 temp = new Vector3(1, 1, 1);
-        // Vector3 tempMoveMe = new Vector3(0, 0, 0);
+        {
         bool isHittingBounds = false;
-        //gonna try to move this to the GameBounds class as a method
-        //Vector3 tempTransform = new Vector3(transform.position.x + targetVector.x, transform.position.y + targetVector.y, 1);
         //gone too wide so push us back into the middle and return [0,y,1] 
         if (comparePosition.x + targetVector.x > GameBounds.maxX)
         {

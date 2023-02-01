@@ -44,3 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3273d0e65313ad14ebc07479c8198d5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameSceneName:
+  - MeteorStorm

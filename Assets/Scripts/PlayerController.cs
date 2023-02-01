@@ -1,11 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
+// using System.Collections;
+// using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+//using UnityEngine.UI;
 //bits that I'm trying
-using OodModels;
-using IModels;
+using GilesStrengthSystem;
+using GilesWeapons;
 using GilesManagers;
+//using GilesMovement;
+using GilesUtilities;
 
 [RequireComponent(typeof(StrengthManager))]
 [RequireComponent(typeof(PowerManager))]
@@ -16,18 +18,26 @@ public class PlayerController : MonoBehaviour
     //very important boolean - possible for IPlayable me thinks
     private bool bIsPlaying = false;
 
+    //sound clips to play for playing when colliding
+    public AudioClip strengthSound, powerSound;
+    public AudioClip damageSound;
+
     //Movement related control system
     private Rigidbody playerRB;
     //all the speed based properties -------
     //affects control twitchyness, other objects use it to make it feel like speed has changed
+    //trying to use this to produce a gui for the speed as well as allowing range to be set in Editor
+    private IStrengthManager speedManager;
     private float speed = 10f;
     public float Speed{
-        get{return speed;}
+        //with changes to MoveForwardRb using VelocityChange this needs tweaking
+        get{return 5 + speedManager.strength;}
     }
-    private float minSpeed = 5f;
-    private float maxSpeed = 20f;
-
+    
     //Rotational movement system
+    public AudioClip boosterSound;
+    //gonna have to add some placeholders for the position of the booster engines as I am struggling to rotate with view
+    [SerializeField] Transform boosterLeft, boosterRight;
     //the amount of torque added by imaginary booster rockets (help get control back when spinning)using System.Collections;
     private float rotationalBoosters = 0.5f;
     //The number by which targetVector.x is divided within AddTorque()
@@ -52,8 +62,6 @@ public class PlayerController : MonoBehaviour
     private IStrengthManager strengthManager;
     //for laser power, removed by firing according to max-rounds setting in weapon
     private IStrengthManager powerManager;
-    //trying to use this to produce a gui for the speed
-    private IStrengthManager speedManager;
     //our gun which is enabled by our PowerManager
     private LaserWeapon laser;
     public LaserWeapon Laser{
@@ -69,9 +77,8 @@ public class PlayerController : MonoBehaviour
     //Use Awake to get all your references (instantiate objects) to avoid the dreaded NullReferenceExeption
     void Awake()
     {
-        //connect with game manager - no need just use the Instance for GameOver()
-        //gameHQ = GameObject.Find("Game Manager").GetComponent<GameManager>();
-        //grab the strength manager which uses a slider as it's UI
+        //grab the strength managers which uses a slider as it's UI
+        //with multiple strength managers they appear in the array in the order they are in the inspector
         StrengthManager[] strengthManagers = GetComponents<StrengthManager>();
         //this is a problem with my entire design now that I want to add a speed UI as another Strength Manager :/
         strengthManager = strengthManagers[0];
@@ -103,15 +110,6 @@ public class PlayerController : MonoBehaviour
         MoveMe(targetVector);
     }
 
-    void LateUpdate()
-    {
-        if (!bIsPlaying) return;
-        //this comes second as it does bounds checking which uses MoveMe() as well
-        //UpdateTargetVector();
-        //CheckForBounds();
-    }
-
-
     void CheckInput()
     {
         //Keyboard based input ----
@@ -132,13 +130,15 @@ public class PlayerController : MonoBehaviour
         //Mouse button input...
         if (Input.GetMouseButtonDown(0))
         {
+            PlaySound(boosterSound, boosterLeft.position);
             // LEFT BUTTON for rotational correction boosters on the left side of ship (rotates clockwise)
-            playerRB.AddTorque(Vector3.forward * rotationalBoosters * speed, ForceMode.Impulse);
+            playerRB.AddTorque(Vector3.forward * rotationalBoosters * Speed, ForceMode.Impulse);
         }
         if (Input.GetMouseButtonDown(1))
         {
+            PlaySound(boosterSound, boosterRight.position);
             // RIGHT BUTTON for rotational correction boosters on the right side of ship (rotates anti-clockwise)
-            playerRB.AddTorque(Vector3.forward * -rotationalBoosters * speed, ForceMode.Impulse);
+            playerRB.AddTorque(Vector3.forward * -rotationalBoosters * Speed, ForceMode.Impulse);
         }
     }
 
@@ -155,50 +155,61 @@ public class PlayerController : MonoBehaviour
     }
 
     //Reset strength, power, speed, rotation and set bIsPlaying = true;
-    public void EnablePlayer(float aStrength, float aPower)
-    {
+    //no longer used since implementing strength managers
+    // public void EnablePlayer(float aStrength, float aPower)
+    // {
+    //     EnablePlayer();
+    //     strengthManager.AddStrengthLevel(aStrength);
+    //     powerManager.AddStrengthLevel(aPower);
+    // }
+
+    public void EnablePlayer()
+    {        
         transform.rotation = originalRotation;
-        //playerRB.MoveRotation(originalRotation);
-        //reset the strength managers to start value plus aStrength/aPower
+        //reset the strength manager
         strengthManager.Enable();
         strengthManager.Reset();
-        strengthManager.AddStrengthLevel(aStrength);
 
         //introducing the speedManager
         speedManager.Enable();
         speedManager.Reset();
-        //taking this out into a strength manager
-        speed = speedManager.strength;
-
+        //going to externalise the speed so other things don't need a reference to the player
+        GameProperties.Instance.SetGameProperty<int>(TagManager.PLAYER_SPEED_PROPERTY,(int)speedManager.strength);
+        
+        //and the ammunition
         powerManager.Enable();
         powerManager.Reset();
-        //then add to the start power
-        powerManager.AddStrengthLevel(aPower);
+
         //Unpause the physics
         Time.timeScale = 1;
         bIsPlaying = true;
     }
 
-    public void EnablePlayer()
+    
+    void PlaySound(AudioClip ac, Vector3 pos)
     {
-        EnablePlayer(0f, 0f);
+        //check if we have a sound to play on death and if we have access to an AudioManager
+        string qualifiedName = typeof(AudioManager).AssemblyQualifiedName;
+        if (ac != null && System.Type.GetType(qualifiedName) != null) AudioManager.PlaySoundFromPosition(pos, ac);
     }
 
-    // Behaviour when hit by collider with isTrigger = true
+    // Behaviour when hit by collider with isTrigger = true which are bonuses
     private void OnTriggerEnter(Collider other)
     {
         //disable all behaviour if the player is dead
         if (!bIsPlaying) return;
-        if (other.CompareTag("ChargeUp"))
+        if (other.CompareTag(TagManager.AMMOBONUS))
         {
             //Charge up so add laser power
             powerManager.AddStrengthLevel(1);// AddPowerLevel(1);
+            PlaySound(powerSound, other.gameObject.transform.position);
             Destroy(other.gameObject);
         }
-        else if (other.CompareTag("StrengthUp"))
+        else if (other.CompareTag(TagManager.HEALTHBONUS))
         {
             //add a bit of strenth
             strengthManager.AddStrengthLevel(strengthManager.maxStrength / 10f);
+            PlaySound(strengthSound, other.gameObject.transform.position);
             Destroy(other.gameObject);
         }
     }
@@ -219,25 +230,15 @@ public class PlayerController : MonoBehaviour
         if (!bIsPlaying) return;
         // Non collider collision behaviour here
         // These collisions cause damage based on the mass of other
-        if (other.gameObject.CompareTag("Planet") || other.gameObject.CompareTag("Meteor") || other.gameObject.CompareTag("Star"))
+        if (other.gameObject.CompareTag(TagManager.ENEMY1) || other.gameObject.CompareTag(TagManager.ENEMY2) || other.gameObject.CompareTag(TagManager.ENEMY3))
         {
-            // You've bumped into a planet
+            // You've bumped into an Enemy
             GameObject otherGO = other.gameObject;
+            PlaySound(damageSound, other.gameObject.transform.position);
             //if AddDamageLevel makes strength below zero it returns false, so then call GameOver()
-            if (!strengthManager.AddDamageLevel(CalculateRbDamage(otherGO))) GameManager.Instance.GameOver();
+            if (!strengthManager.AddDamageLevel(StrengthManager.CalculateRbDamage(otherGO, speed, playerRB.mass))) GameManager.Instance.GameOver();
         }
     }
-
-    //use speed and rigidbody mass to calculate the damage level due to a collision
-    float CalculateRbDamage(GameObject otherGO)
-    {
-        //How big was the hit? Basic sum based on mass and speed
-        //using polymorphism with MoveForwardRb which is the base moving class
-        float damage = speed + otherGO.GetComponent<MoveForwardRb>().speed;
-        damage += otherGO.GetComponent<Rigidbody>().mass - playerRB.mass;
-        return damage;
-    }
-
     //the mouse motion control set up
     void SetupTargetVector()
     {
@@ -266,14 +267,9 @@ public class PlayerController : MonoBehaviour
         targetVector.x = -targetVector.x;
         targetVector.z = targetPosition.z - transform.position.z;
         //multiply by speed so as you go faster the motion gets faster
-        targetVector *= speed;
-        //Let's try a different way - not working....
-        // targetVector = Input.mousePosition;
-        // targetVector.z = Camera.main.nearClipPlane;//targetPosition.z - transform.position.z;
-        // //targetVector = Camera.main.ScreenToWorldPoint(targetVector);
-        // Vector3.Normalize(targetVector);
+        targetVector *= Speed;
         //Let's see if this happens to work first time...yeah :)
-        //targetVector is modified in this function, makes it bounce off the bounds
+        //!! targetVector is modified in this function, makes it bounce off the bounds
         GameBounds.Instance.CheckForXYBounds(transform.position, ref targetVector);
     }
 
@@ -281,22 +277,21 @@ public class PlayerController : MonoBehaviour
     {
         //going to add some rotational behaviour...
         playerRB.AddTorque(Vector3.forward * -((target.x*DifficultyManager.difficulty) / rotationalDamper), ForceMode.Impulse);
-        playerRB.AddForce(target * speed, ForceMode.Impulse);
+        playerRB.AddForce(target * Speed, ForceMode.Impulse);
     }
 
     //for other game objects to access but not effect
     //public float GetSpeed(){return speed;}
     //implement as Properties now I've discovered that's how
     //c# deals with encapsulation
-
+    //became important again when using a strength manager for speed with a UI
+    //and implementing my GameProperties
     void ChangeSpeed(float toChangeBy)
     {
         if(toChangeBy > 0) speedManager.AddStrengthLevel(toChangeBy);
         else speedManager.AddDamageLevel(toChangeBy*-1);
-        speed = speedManager.strength;
-        // speed += toChangeBy;
-        // if (speed > maxSpeed) speed = maxSpeed;
-        // if (speed < minSpeed) speed = minSpeed;
-        Debug.Log("Speed is: " + speed);
+        //going to externalise the speed so other things don't need a reference to the player
+        GameProperties.Instance.SetGameProperty<int>(TagManager.PLAYER_SPEED_PROPERTY,(int)speedManager.strength);
+        Debug.Log("Speed is: " + GameProperties.Instance.GetGameProperty<int>("Player Speed"));
     }
 }

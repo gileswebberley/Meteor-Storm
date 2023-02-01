@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-
-namespace IModels
+namespace GilesSpawnSystem
 {
     /*
     This is from my learning about implementing OOD into my coding. I started with 

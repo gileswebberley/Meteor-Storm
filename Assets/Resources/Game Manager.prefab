@@ -147,7 +147,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   difficultyChangeTime: 60
-  scoreTMPName: Score Text
+  gameSceneName:
+  - MeteorStorm
 --- !u!1 &838675536114440129
 GameObject:
   m_ObjectHideFlags: 0

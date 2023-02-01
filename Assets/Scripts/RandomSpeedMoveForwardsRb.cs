@@ -1,5 +1,6 @@
 using UnityEngine;
-
+using GilesMovement;
+//I broke something in the inheritance of MonoBehaviour by putting this inside GilesMovement namespace
 
 public class RandomSpeedMoveForwardsRb : MoveForwardRb
 {

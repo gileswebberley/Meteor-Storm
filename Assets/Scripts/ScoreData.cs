@@ -1,7 +1,7 @@
 using System.Collections;
 using System;
 
-namespace OodModels
+namespace GilesScoreSystem
 {
     //I believe the IComparable will make Sort<ScoreData>() function based on score
     [System.Serializable]

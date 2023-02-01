@@ -1,7 +1,7 @@
 using UnityEngine;
-using IModels;
+using GilesSpawnSystem;
 
-namespace GilesManagers
+namespace GilesStrengthSystem
 {
     public class StrengthManagerBase : MonoBehaviour, IStrengthManager
     {
@@ -64,9 +64,9 @@ namespace GilesManagers
 
         //Implement damage which is based on the mass of what's hit you
         //when it get's to zero it's GAME OVER - to extract it out into a class
-        public virtual bool AddDamageLevel(float damage)
+        public virtual bool AddDamageLevel(float toRemove)
         {
-            _strength -= damage;
+            _strength -= toRemove;
             Debug.Log("DAMAGE: Strength is now: " + _strength);
 
             //If we are completely damaged it's game over
@@ -79,6 +79,15 @@ namespace GilesManagers
             }
             UpdateUI();
             return true;
+        }
+
+        //going to move the damage calculations out of PlayerController as it seems out of place
+        public static float CalculateRbDamage(GameObject otherGO, float speed, float mass)
+        {
+            float damage = otherGO.GetComponent<Rigidbody>().mass - mass;
+            var otherSpeed = otherGO.GetComponent<GilesMovement.IHaveSpeed>();
+            if(otherSpeed != null) damage += speed + otherSpeed.Speed;
+            return damage;
         }
 
         //the opposite of AddDamageLevel()

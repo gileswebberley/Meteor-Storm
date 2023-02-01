@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace OodModels
+namespace GilesScoreSystem
 {
     //Templating seemed to make it work, ie <ScoreData>
     [System.Serializable]
