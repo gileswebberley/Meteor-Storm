@@ -41,10 +41,10 @@ public class SceneDirector : MonoBehaviour
     //for the Quit button in the game over page that is created by GameManager.
     //as I'm trying to attach it via AddListener I couldn't pass in the string,
     //had a quick go using a delegate but need to look into why that didn't help
-    public static void GoToStart()
-    {
-        SceneManager.LoadScene("Welcome");
-    }
+    // public static void GoToStart()
+    // {
+    //     SceneManager.LoadScene("Welcome");
+    // }
 
     public static void LoadSceneByName(string nameStr)
     {
