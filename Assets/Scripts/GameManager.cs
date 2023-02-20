@@ -104,7 +104,7 @@ public class GameManager : MonoBehaviour
             Debug.LogError($"GAME MANAGER IS MISSING A VITAL GAMEOBJECT  - No prefab named {TagManager.SPAWN} in the Assets/Resources folder");
         }
     }
-
+    //really just an experiment to try to find different ways to work within Unity
     public void CreateGameOver()
     {
         if (gameOverUI != null) return;
@@ -119,7 +119,9 @@ public class GameManager : MonoBehaviour
         restartButton.onClick.AddListener(RestartGame);
         Button quitButton = gameOverUI.transform.Find(TagManager.GAMEOVERQUITBUTTON).GetComponent<Button>();
         //must come back to work out how to add a method with a parameter - fix for now
-        quitButton.onClick.AddListener(SceneDirector.GoToStart);
+        //quitButton.onClick.AddListener(SceneDirector.GoToStart);
+        //use a Lambda function to pass the parameter via an empty method call
+        quitButton.onClick.AddListener(() => {SceneDirector.LoadSceneByName("Welcome");});//yay, this is the solution!!
         //seems to work very nicely
         if (gameOverUI == null)
         {
