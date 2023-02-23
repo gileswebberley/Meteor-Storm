@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
     private bool gameOver = false;
 
     //How long to wait before upping the difficulty, default 1 minute
-    [SerializeField] private int difficultyChangeTime = 60;
+    [SerializeField, Tooltip("The number of seconds to wait before upping difficulty level")] private int difficultyChangeTime = 60;
 
     //this is untested except with a single entry and no scene changes at the moment
     //+ Now in SceneDirector
@@ -41,7 +41,6 @@ public class GameManager : MonoBehaviour
     //"Game Over Page" must be a prefab in the Resources folder
     //it must have buttons named "Restart" and "Quit" and a TextMeshProUIGUI named "Score Ranking"
     private GameObject gameOverUI;
-    //private int score = 0;
 
     //This runs before the Start() method, use to instantiate objects of a class
     void Awake()
@@ -81,7 +80,7 @@ public class GameManager : MonoBehaviour
         //this way we control when we want it and so don't get all the Null Reference Exceptions
         //explicit because System has Object as well, I'm using that for the Array.Exists()
         GameObject playerGO = UnityEngine.Object.Instantiate(Resources.Load(TagManager.PLAYER)) as GameObject;
-        //set the name so that the MoveForwardRb can still find the speed
+        //set the name so that the MoveForwardRb can still find the speed ++ This is now via GameProperties
         playerGO.name = TagManager.PLAYER;
         //a little attempt at extending TagManager to include component Types
         //System.Type tmpP = System.Type.GetType(TagManager.PLAYER_TYPE);
