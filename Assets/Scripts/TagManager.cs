@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using GilesScoreSystem;
 
 //a static class to centralise all the string literals that are used throughout the game
 public static class TagManager
@@ -42,5 +41,26 @@ public static class TagManager
 
     //just a test for using in GetComponent() not sure this even makes logical sense!?
     //testing whether we can use this in combination with System.Types.GetType() - not currently
-    public static string PLAYER_TYPE = typeof(PlayerController).AssemblyQualifiedName;
+    //public static string PLAYER_TYPE = typeof(PlayerController).AssemblyQualifiedName;
+    //just created this in an other project and thought this might be a good place to stash it
+    //Safely try to Find(find) and GetComponent<T>
+    public static bool SafeFind<T>(string find, ref T component)
+    {
+        GameObject returnGO = GameObject.Find(find);
+        if(returnGO == null){
+            Debug.Log($"Find({find}) returned null");
+             component = default(T);
+             return false;
+        }else{
+            Debug.Log($"Find({find}) returned a game object");
+            if(returnGO.TryGetComponent<T>(out T tmpComponent)){
+                component = tmpComponent;
+                return true;
+            }else{
+                Debug.Log("But couldn't find the component");
+                component = default(T);
+                return false;
+            }
+        }
+    }
 }

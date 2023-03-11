@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //namespace for GameBounds singleton that is set in Gamemanager
-using GilesScoreSystem;
+using GilesUtilities;
 using GilesSpawnSystem;
 using GilesManagers;
 

@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 //using AudioManager to play our sounds
-using GilesUtilities;
+using GilesManagers;
 
 namespace GilesWeapons
 {

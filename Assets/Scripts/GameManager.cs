@@ -8,8 +8,9 @@ using TMPro;
 using UnityEngine.UI;
 using GilesScoreSystem;
 using GilesSpawnSystem;
-//for DifficultyManager and GameBounds
+//for DifficultyManager
 using GilesManagers;
+using GilesUtilities;
 
 //Introducing a TagManager to look after all the string literals - like names of prefabs and game objects
 public class GameManager : MonoBehaviour

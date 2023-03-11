@@ -130,16 +130,26 @@ public class PlayerController : MonoBehaviour
         //Mouse button input...
         if (Input.GetMouseButtonDown(0))
         {
-            PlaySound(boosterSound, boosterLeft.position);
-            // LEFT BUTTON for rotational correction boosters on the left side of ship (rotates clockwise)
-            playerRB.AddTorque(Vector3.forward * rotationalBoosters * Speed, ForceMode.Impulse);
+            // PlaySound(boosterSound, boosterLeft.position);
+            // // LEFT BUTTON for rotational correction boosters on the left side of ship (rotates clockwise)
+            // playerRB.AddTorque(Vector3.forward * rotationalBoosters * Speed, ForceMode.Impulse);
+            SideBoosters(1);
         }
         if (Input.GetMouseButtonDown(1))
         {
-            PlaySound(boosterSound, boosterRight.position);
-            // RIGHT BUTTON for rotational correction boosters on the right side of ship (rotates anti-clockwise)
-            playerRB.AddTorque(Vector3.forward * -rotationalBoosters * Speed, ForceMode.Impulse);
+            // PlaySound(boosterSound, boosterRight.position);
+            // // RIGHT BUTTON for rotational correction boosters on the right side of ship (rotates anti-clockwise)
+            // playerRB.AddTorque(Vector3.forward * -rotationalBoosters * Speed, ForceMode.Impulse);
+            SideBoosters(-1);
         }
+    }
+
+    ///[param]dir - -1 for right booster, 1 for left booster [/param]
+    void SideBoosters(int dir)
+    {
+        playerRB.AddTorque(Vector3.forward * (rotationalBoosters*dir) * Speed, ForceMode.Impulse);
+        if(dir>0)PlaySound(boosterSound, boosterLeft.position);
+        else PlaySound(boosterSound, boosterRight.position);
     }
 
     public void DisablePlayer()

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 //haven't implemented this so far, and have since discovered that Unity
 //has a game properties system, although it's good to work through problems
 //to learn - so new to C# that I hadn't worked with Dictionaries before
-namespace GilesManagers
+namespace GilesUtilities
 {
     //I'm thinking of making a central point for objects in the game to find
     //out basic info about others without having to access the GameObject Component itself

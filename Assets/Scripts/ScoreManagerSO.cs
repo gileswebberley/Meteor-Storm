@@ -31,8 +31,6 @@ namespace GilesScoreSystem
         //in another object so _thisScore will be set according to the name of the score 
         //referenced by name of the dictionary entry
 
-        //score will always remain above or at zero
-        //protected int _score = 0;
         public int score {
             //using data property to access to check there's an instance of ScoreData
             get{return data.score;}

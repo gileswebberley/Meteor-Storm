@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using GilesSpawnSystem;
 using GilesScoreSystem;
-using GilesUtilities;
+using GilesManagers;
 //this seems to have made Start() etc throw up problems
 //using GilesMovement;
 

@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 //custom namespace created for my attempts at refactoring Meteor Storm
-namespace GilesManagers
+namespace GilesUtilities
 {
     /*
     A singleton to give access to centralised game bounds that is managed.

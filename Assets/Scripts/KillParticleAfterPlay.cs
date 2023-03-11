@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 namespace GilesUtilities {
 //to destroy any particle systems that are Instantiated
 public class KillParticleAfterPlay : MonoBehaviour

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 //for GameBounds which are set in GameManager
 using GilesManagers;
+using GilesUtilities;
 
 namespace GilesMovement{
 
