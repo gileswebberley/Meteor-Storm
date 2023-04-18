@@ -1587,7 +1587,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8e21036d4afcc58faa6a0842287ce8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _startStrength: 20
+  _startStrength: 500
   _maxStrength: 1000
   _minStrength: 0
   strengthSlider: {fileID: 9205699484233134408}

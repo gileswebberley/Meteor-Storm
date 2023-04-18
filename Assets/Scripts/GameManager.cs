@@ -26,7 +26,8 @@ public class GameManager : MonoBehaviour
     private bool gameOver = false;
 
     //How long to wait before upping the difficulty, default 1 minute
-    [SerializeField, Tooltip("The number of seconds to wait before upping difficulty level")] private int difficultyChangeTime = 60;
+    [SerializeField, Tooltip("The number of seconds to wait before upping difficulty level")] 
+    private int difficultyChangeTime = 60;
 
     //this is untested except with a single entry and no scene changes at the moment
     //+ Now in SceneDirector
