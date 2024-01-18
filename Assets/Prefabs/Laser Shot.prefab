@@ -129,8 +129,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8e6e6925e1eafe4a861ce5b30c4f193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 20
-  speedModifier: 5
+  speedModifier: 40
   laserPower: 1
 --- !u!82 &5723779362572753988
 AudioSource:

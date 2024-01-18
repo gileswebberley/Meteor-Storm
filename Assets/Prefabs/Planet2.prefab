@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3122467906245281059}
   - component: {fileID: 3122467906245281063}
   - component: {fileID: 759390426509800999}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Planet2
   m_TagString: Planet
   m_Icon: {fileID: 0}

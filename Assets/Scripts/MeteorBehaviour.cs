@@ -83,7 +83,7 @@ public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy
         ++spawn.currentSpawnedEnemies;
     }
 
-    void OnTriggerEnter(Collider other)
+   /* void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag(TagManager.BULLET))
         {
@@ -100,6 +100,22 @@ public class MeteorBehaviour : RandomSpeedMoveForwardsRb, ISpawnedEnemy
                 ScoringSystem.Instance.Scorer.AddToScore((int)startPower);//warning casting to int
                 RemoveFromSpawn();
             }
+        }
+    }*/
+
+    //implement the message sent from the new RayCast system within LaserBehaviour
+    void OnProjectileCollision(LaserBehaviour bullet)
+    {
+        Debug.Log("MeteorBehaviour object has been hit via OnProjectileCollision from LaserBehaviour");
+        power -= bullet.laserPower;
+        if (power <= 0)
+        {
+            //can't get the particle system to work :( ++ There we go, simply use Instantiate rather than try to play it
+            Instantiate(explodePS, transform.position, transform.rotation);
+            PlaySound();
+            //add my original power to the player score
+            ScoringSystem.Instance.Scorer.AddToScore((int)startPower);//warning casting to int
+            RemoveFromSpawn();
         }
     }
 
