@@ -53,6 +53,7 @@ public class SpawnManager : SpawnerBase
         //     //the interface that adds and removes themselves from the currentEnemyCount
         //     Debug.Log("ENEMY PREFAB IS ISpawnedEnemy");
         // }
+        
     }
 
     void Awake(){
@@ -186,7 +187,7 @@ public class SpawnManager : SpawnerBase
             //use the utility function inherited from SpawnerBase set to 10 so they are spread around the environment
             Vector3 birthPos = GetRandomStartPosition(10f);
             birthPos.z /= 10f;
-            Instantiate(planetPrefabs[randomSelection],birthPos,planetPrefabs[randomSelection].transform.rotation);
+            Instantiate(planetPrefabs[randomSelection],birthPos,planetPrefabs[randomSelection].transform.rotation,transform);
         }
     }
 
@@ -197,7 +198,7 @@ public class SpawnManager : SpawnerBase
             int randomSelection = Random.Range(0,meteorPrefabs.Length);
             GameObject selection = meteorPrefabs[randomSelection];
             Vector3 birthPos = GetRandomStartPosition();
-            Instantiate(selection,birthPos,selection.transform.rotation);
+            Instantiate(selection,birthPos,selection.transform.rotation,transform);
         }
     }
     void SpawnStars(int min, int max){
@@ -208,7 +209,7 @@ public class SpawnManager : SpawnerBase
             int randomSelection = Random.Range(0,starPrefabs.Length);
             Vector3 birthPos = GetRandomStartPosition(10f);
             birthPos.z /= 10f;
-            Instantiate(starPrefabs[randomSelection],birthPos,starPrefabs[randomSelection].transform.rotation);
+            Instantiate(starPrefabs[randomSelection],birthPos,starPrefabs[randomSelection].transform.rotation,transform);
         }
     }
     void SpawnPowerUps(int min, int max){
@@ -217,7 +218,7 @@ public class SpawnManager : SpawnerBase
         for(int i = 0; i < totalSpawn; i++){
             int randomSelection = Random.Range(0,powerPrefabs.Length);
             Vector3 birthPos = GetRandomStartPosition();
-            Instantiate(powerPrefabs[randomSelection],birthPos,powerPrefabs[randomSelection].transform.rotation);
+            Instantiate(powerPrefabs[randomSelection],birthPos,powerPrefabs[randomSelection].transform.rotation,transform);
         }
     }
 

@@ -13,7 +13,7 @@ public class LaserBehaviour : MoveForwardRb
     protected Vector3 direction = Vector3.back;
     protected LayerMask hitLayerMask;
 
-    void Start()
+    protected override void Start()
     {
         base.Start();
         lastPosition = transform.position;

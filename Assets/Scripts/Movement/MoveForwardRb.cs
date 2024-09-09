@@ -30,7 +30,7 @@ public class MoveForwardRb : MonoBehaviour, IHaveSpeed
     //This is the declared required component
     protected Rigidbody thisRB;
 
-    // Start is called before the first frame update
+    // Start is called before the first frame update, protected and virtual so it can be overriden by child classes
     protected virtual void Start()
     {
         //this is bad coding practise I think, is it called coupling?
